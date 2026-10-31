@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="nl">
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>1ZV60 Oefenmodule</title>
+<title>1ZV60 Practice Module</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 :root{--navy:#14213d;--slate:#475569;--bg:#f1f5f9;--card:#fff;--line:#cbd5e1;--ok:#059669;--okbg:#d1fae5;--bad:#dc2626;--badbg:#fee2e2;--acc:#1e3a8a}
@@ -33,22 +33,40 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .big{font-size:2.6rem;font-weight:700;color:var(--ok)}
 .wrong{border-top:1px solid var(--line);padding:10px 0;font-size:.95rem}
 .hidden{display:none}
+.crow{display:grid;grid-template-columns:3em 1fr 4em 6.5em;gap:8px;align-items:center;padding:4px 0;cursor:pointer;font-size:.9rem}
+.crow:hover{background:var(--bg)}.crow .bar{margin:0}.cp{font-weight:600}.cs{color:var(--slate);font-size:.8rem}
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>1ZV60 · Methodology for IE Research</h1>
-  <div class="meta" style="margin-bottom:14px">Oefenmodule o.b.v. Bell, Bryman &amp; Harley – Business Research Methods</div>
+  <div class="meta" style="margin-bottom:14px">Practice module based on Bell, Bryman &amp; Harley – Business Research Methods</div>
 
   <!-- STARTSCHERM -->
   <section id="setup" class="card">
-    <label for="chSel">Hoofdstuk</label>
+    <label for="chSel">Chapter</label>
     <select id="chSel"></select>
-    <label for="nSel">Aantal vragen</label>
+    <label for="nSel">Number of questions</label>
     <select id="nSel">
-      <option value="10">10</option><option value="20">20</option><option value="all">Alles</option>
+      <option value="10">10</option><option value="20">20</option><option value="all">All</option>
     </select>
-    <div class="row"><button id="startBtn">Start oefenen</button></div>
+    <label for="mSel">Which questions</label>
+    <select id="mSel"><option value="all">All questions</option><option value="weak">Only new and not yet mastered questions</option></select>
+    <div class="row"><button id="startBtn">Start practising</button></div>
+  </section>
+
+  <section id="dash" class="card">
+    <h2 style="margin-top:0;font-size:1.1rem">Your progress</h2>
+    <div id="dashTop"></div>
+    <div class="bar"><i id="dashBar" style="width:0"></i></div>
+    <div id="dashRows"></div>
+    <div class="row">
+      <button class="sec" id="expBtn">Export</button>
+      <button class="sec" id="impBtn">Import</button>
+      <button class="sec" id="resetBtn">Reset</button>
+      <input type="file" id="impFile" accept=".json" class="hidden">
+    </div>
+    <div class="meta" style="margin-top:10px">A question is mastered after at least 2 attempts with ≥90% correct. A chapter is learned (✔) when ≥90% of its questions are mastered. Click a chapter to select it. Progress is saved in this browser.</div>
   </section>
 
   <!-- QUIZ -->
@@ -60,20 +78,20 @@ button:disabled{opacity:.4;cursor:not-allowed}
     <div id="opts"></div>
     <div id="why" class="why hidden"></div>
     <div class="row">
-      <button id="nextBtn" class="hidden">Volgende vraag</button>
-      <button id="quitBtn" class="sec">Stoppen</button>
+      <button id="nextBtn" class="hidden">Next question</button>
+      <button id="quitBtn" class="sec">Stop</button>
     </div>
   </section>
 
   <!-- RESULTAAT -->
   <section id="result" class="card hidden">
-    <h2>Resultaat</h2>
+    <h2>Results</h2>
     <div class="big" id="resPct"></div>
     <div id="resTxt"></div>
     <div id="wrongList"></div>
     <div class="row">
-      <button id="retryBtn">Alleen foute vragen opnieuw</button>
-      <button id="homeBtn" class="sec">Terug naar start</button>
+      <button id="retryBtn">Retry only wrong questions</button>
+      <button id="homeBtn" class="sec">Back to start</button>
     </div>
   </section>
 </div>
@@ -81,8 +99,8 @@ button:disabled{opacity:.4;cursor:not-allowed}
 <script>
 /* =====================================================================
    DATASET – vragen toevoegen:
-   QUESTIONS.push(Q(hoofdstuknummer, "Vraag", ["optie a","optie b","optie c","optie d"], indexJuisteOptie(0-3), "Toelichting"));
-   De id wordt automatisch toegekend. Hoofdstukken 1–25 verschijnen automatisch in het menu.
+   QUESTIONS.push(Q(chapterNumber, "Question", ["option a","option b","option c","option d"], indexOfCorrectOption(0-3), "Rationale"));
+   The id is assigned automatically. Chapters 1–25 appear in the menu automatically.
    ===================================================================== */
 let _id = 0;
 const Q = (chapter, question, opts, c, rationale) => ({
@@ -452,13 +470,41 @@ let session = [], idx = 0, correct = 0, wrongIds = [], picked = null, answered =
 // Menu vullen (H1–H25 + alle)
 (function buildMenu(){
   const cnt = {}; QUESTIONS.forEach(q => cnt[q.chapter] = (cnt[q.chapter]||0)+1);
-  let h = `<option value="all">Volledige oefentoets – alle hoofdstukken (${QUESTIONS.length})</option>`;
-  for (let c = 1; c <= 25; c++) h += `<option value="${c}" ${cnt[c]?"":"disabled"}>H${c} (${cnt[c]||0} vragen)</option>`;
+  let h = `<option value="all">Full practice exam – all chapters (${QUESTIONS.length})</option>`;
+  for (let c = 1; c <= 25; c++) h += `<option value="${c}" ${cnt[c]?"":"disabled"}>H${c} (${cnt[c]||0} questions)</option>`;
   $("chSel").innerHTML = h;
 })();
 
 const shuffle = a => { a = [...a]; for (let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];} return a; };
-const show = id => ["setup","quiz","result"].forEach(s => $(s).classList.toggle("hidden", s !== id));
+const show = id => { ["setup","quiz","result"].forEach(s => $(s).classList.toggle("hidden", s !== id));
+  $("dash").classList.toggle("hidden", id !== "setup"); if (id === "setup") renderDash(); };
+
+/* ---------- Voortgang (localStorage, met fallback in geheugen) ---------- */
+const KEY = "1zv60-progress-v1"; let mem = {};
+function load(){ try { return JSON.parse(localStorage.getItem(KEY)) || mem; } catch(e){ return mem; } }
+function save(d){ mem = d; try { localStorage.setItem(KEY, JSON.stringify(d)); } catch(e){} }
+function record(id, ok){ const d = load(), r = d[id] || {a:0,c:0}; r.a++; if (ok) r.c++; d[id] = r; save(d); }
+function mastered(id){ const r = load()[id]; return !!r && r.a >= 2 && r.c / r.a >= 0.9; }
+function renderDash(){
+  const d = load(), by = {}; QUESTIONS.forEach(q => (by[q.chapter] = by[q.chapter] || []).push(q));
+  let tot = 0, mas = 0, learned = 0, h = "";
+  for (let c = 1; c <= 25; c++){ const qs = by[c]; if (!qs) continue;
+    const m = qs.filter(q => mastered(q.id)).length, seen = qs.filter(q => d[q.id]).length;
+    const p = Math.round(m / qs.length * 100), done = p >= 90; tot += qs.length; mas += m; if (done) learned++;
+    h += `<div class="crow" data-c="${c}"><b>H${c}</b><div class="bar"><i style="width:${p}%"></i></div><span class="cp">${p}%${done ? " ✔" : ""}</span><span class="cs">${seen}/${qs.length} seen</span></div>`;
+  }
+  const P = tot ? Math.round(mas / tot * 100) : 0;
+  $("dashTop").innerHTML = `<b>${P}% mastered</b> (${mas} of ${tot} questions) · ${learned} chapters learned`;
+  $("dashBar").style.width = P + "%"; $("dashRows").innerHTML = h;
+  $("dashRows").querySelectorAll(".crow").forEach(r => r.onclick = () => { $("chSel").value = r.dataset.c; scrollTo(0,0); });
+}
+$("expBtn").onclick = () => { const a = document.createElement("a");
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(load())], {type:"application/json"}));
+  a.download = "1zv60-progress.json"; a.click(); };
+$("impBtn").onclick = () => $("impFile").click();
+$("impFile").onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader();
+  r.onload = () => { try { save(JSON.parse(r.result)); renderDash(); } catch(x){ alert("Invalid file."); } }; r.readAsText(f); };
+$("resetBtn").onclick = () => { if (confirm("Delete all progress?")) { save({}); renderDash(); } };
 
 function start(pool){
   session = pool; idx = 0; correct = 0; wrongIds = [];
@@ -467,7 +513,8 @@ function start(pool){
 
 $("startBtn").onclick = () => {
   const ch = $("chSel").value, n = $("nSel").value;
-  let pool = QUESTIONS.filter(q => ch === "all" || q.chapter == ch);
+  let pool = QUESTIONS.filter(q => (ch === "all" || q.chapter == ch) && ($("mSel").value === "all" || !mastered(q.id)));
+  if (!pool.length) { alert("No questions in this selection – everything is already mastered!"); return; }
   pool = shuffle(pool);
   if (n !== "all") pool = pool.slice(0, +n);
   start(pool);
@@ -475,10 +522,10 @@ $("startBtn").onclick = () => {
 
 function render(){
   const q = session[idx]; picked = null; answered = false;
-  $("prog").textContent = `Vraag ${idx+1} van ${session.length}`;
+  $("prog").textContent = `Question ${idx+1} of ${session.length}`;
   $("score").textContent = `✔ ${correct}  ✘ ${idx - correct}`;
   $("barFill").style.width = (idx/session.length*100) + "%";
-  $("chLabel").textContent = `Hoofdstuk ${q.chapter}`;
+  $("chLabel").textContent = `Chapter ${q.chapter}`;
   $("qText").textContent = q.question;
   $("opts").innerHTML = "";
   q.options.forEach(o => {
@@ -491,7 +538,7 @@ function render(){
   });
   $("why").classList.add("hidden");
   $("nextBtn").classList.add("hidden");
-  $("nextBtn").textContent = idx === session.length-1 ? "Bekijk resultaat" : "Volgende vraag";
+  $("nextBtn").textContent = idx === session.length-1 ? "See results" : "Next question";
 }
 
 function answer(letter){
@@ -503,16 +550,17 @@ function answer(letter){
     else if (b.dataset.l === picked) b.classList.add("bad");
   });
   if (picked === q.correctAnswer) correct++; else wrongIds.push(q.id);
+  record(q.id, picked === q.correctAnswer);
   $("score").textContent = `✔ ${correct}  ✘ ${idx + 1 - correct}`;
   $("barFill").style.width = ((idx+1)/session.length*100) + "%";
-  $("why").innerHTML = `<b>${picked === q.correctAnswer ? "Correct!" : "Fout – juist antwoord: " + q.correctAnswer + "."}</b><br>`;
+  $("why").innerHTML = `<b>${picked === q.correctAnswer ? "Correct!" : "Wrong – correct answer: " + q.correctAnswer + "."}</b><br>`;
   $("why").append(q.rationale);
   $("why").classList.remove("hidden");
   $("nextBtn").classList.remove("hidden");
   if (picked === q.correctAnswer) confetti();
 }
 
-// Confetti bij goed antwoord
+// Confetti on a correct answer
 const cv = document.createElement("canvas");
 cv.style.cssText = "position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:99";
 document.body.appendChild(cv);
@@ -530,7 +578,7 @@ function confetti(){
   })();
 }
 
-// Toetsenbord: a–d kiezen, Enter / pijltje rechts = volgende
+// Keyboard: a–d to answer, Enter / right arrow = next
 document.addEventListener("keydown", e => {
   if ($("quiz").classList.contains("hidden")) return;
   const k = e.key.toLowerCase();
@@ -544,15 +592,15 @@ $("quitBtn").onclick = () => { if (answered || idx > 0) { session = session.slic
 function finish(){
   const pct = Math.round(correct / session.length * 100);
   $("resPct").textContent = pct + "%";
-  $("resTxt").textContent = `${correct} van ${session.length} goed.`;
-  $("wrongList").innerHTML = wrongIds.length ? "<h3>Foutief beantwoord</h3>" : "<p>Geen fouten – top!</p>";
+  $("resTxt").textContent = `${correct} of ${session.length} correct.`;
+  $("wrongList").innerHTML = wrongIds.length ? "<h3>Answered incorrectly</h3>" : "<p>No mistakes – great!</p>";
   wrongIds.forEach(id => {
     const q = QUESTIONS.find(x => x.id === id), d = document.createElement("div");
     d.className = "wrong";
     const ans = q.options.find(o => o.letter === q.correctAnswer).text;
     d.innerHTML = `<b></b><br><span style="color:var(--ok)"></span>`;
     d.firstChild.textContent = `H${q.chapter}: ${q.question}`;
-    d.lastChild.textContent = `Juist: ${q.correctAnswer}. ${ans}`;
+    d.lastChild.textContent = `Correct: ${q.correctAnswer}. ${ans}`;
     $("wrongList").appendChild(d);
   });
   $("retryBtn").classList.toggle("hidden", !wrongIds.length);
@@ -561,6 +609,7 @@ function finish(){
 
 $("retryBtn").onclick = () => start(shuffle(wrongIds.map(id => QUESTIONS.find(q => q.id === id))));
 $("homeBtn").onclick = () => show("setup");
+renderDash();
 </script>
 </body>
 </html>
