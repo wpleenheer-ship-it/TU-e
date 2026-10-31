@@ -34,7 +34,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
 .wrong{border-top:1px solid var(--line);padding:10px 0;font-size:.95rem}
 .hidden{display:none}
 .crow{display:grid;grid-template-columns:3em 1fr 4em 6.5em;gap:8px;align-items:center;padding:4px 0;cursor:pointer;font-size:.9rem}
-.crow:hover{background:var(--bg)}.crow .bar{margin:0}.cp{font-weight:600}.cs{color:var(--slate);font-size:.8rem}
+.crow:hover{background:var(--bg)}.crow .bar{margin:0}.bar{position:relative}.bar i{position:absolute;left:0;top:0}.bar i.lt{background:var(--acc);opacity:.4}.cp{font-weight:600}.cs{color:var(--slate);font-size:.8rem}
 </style>
 </head>
 <body>
@@ -58,7 +58,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
   <section id="dash" class="card">
     <h2 style="margin-top:0;font-size:1.1rem">Your progress</h2>
     <div id="dashTop"></div>
-    <div class="bar"><i id="dashBar" style="width:0"></i></div>
+    <div class="bar"><i class="lt" id="dashBar0" style="width:0"></i><i id="dashBar" style="width:0"></i></div>
     <div id="dashRows"></div>
     <div class="row">
       <button class="sec" id="expBtn">Export</button>
@@ -66,7 +66,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
       <button class="sec" id="resetBtn">Reset</button>
       <input type="file" id="impFile" accept=".json" class="hidden">
     </div>
-    <div class="meta" style="margin-top:10px">A question is mastered after at least 2 attempts with ≥90% correct. A chapter is learned (✔) when ≥90% of its questions are mastered. Click a chapter to select it. Progress is saved in this browser.</div>
+    <div class="meta" style="margin-top:10px">Light bar = answered correctly at least once; solid bar = mastered. A question is mastered after at least 2 attempts with ≥90% correct. A chapter is learned (✔) when ≥90% of its questions are mastered. Click a chapter to select it. Progress is saved in this browser.</div>
   </section>
 
   <!-- QUIZ -->
@@ -487,15 +487,16 @@ function record(id, ok){ const d = load(), r = d[id] || {a:0,c:0}; r.a++; if (ok
 function mastered(id){ const r = load()[id]; return !!r && r.a >= 2 && r.c / r.a >= 0.9; }
 function renderDash(){
   const d = load(), by = {}; QUESTIONS.forEach(q => (by[q.chapter] = by[q.chapter] || []).push(q));
-  let tot = 0, mas = 0, learned = 0, h = "";
+  let tot = 0, mas = 0, ok1 = 0, learned = 0, h = "";
   for (let c = 1; c <= 25; c++){ const qs = by[c]; if (!qs) continue;
     const m = qs.filter(q => mastered(q.id)).length, seen = qs.filter(q => d[q.id]).length;
-    const p = Math.round(m / qs.length * 100), done = p >= 90; tot += qs.length; mas += m; if (done) learned++;
-    h += `<div class="crow" data-c="${c}"><b>H${c}</b><div class="bar"><i style="width:${p}%"></i></div><span class="cp">${p}%${done ? " ✔" : ""}</span><span class="cs">${seen}/${qs.length} seen</span></div>`;
+    const o1 = qs.filter(q => d[q.id] && d[q.id].c > 0).length, p1 = Math.round(o1 / qs.length * 100);
+    const p = Math.round(m / qs.length * 100), done = p >= 90; tot += qs.length; mas += m; ok1 += o1; if (done) learned++;
+    h += `<div class="crow" data-c="${c}"><b>H${c}</b><div class="bar" title="${p1}% answered correctly at least once · ${p}% mastered"><i class="lt" style="width:${p1}%"></i><i style="width:${p}%"></i></div><span class="cp">${p}%${done ? " ✔" : ""}</span><span class="cs">${seen}/${qs.length} seen</span></div>`;
   }
-  const P = tot ? Math.round(mas / tot * 100) : 0;
-  $("dashTop").innerHTML = `<b>${P}% mastered</b> (${mas} of ${tot} questions) · ${learned} chapters learned`;
-  $("dashBar").style.width = P + "%"; $("dashRows").innerHTML = h;
+  const P = tot ? Math.round(mas / tot * 100) : 0, P1 = tot ? Math.round(ok1 / tot * 100) : 0;
+  $("dashTop").innerHTML = `<b>${P}% mastered</b> (${mas} of ${tot} questions) · ${P1}% answered correctly at least once · ${learned} chapters learned`;
+  $("dashBar").style.width = P + "%"; $("dashBar0").style.width = P1 + "%"; $("dashRows").innerHTML = h;
   $("dashRows").querySelectorAll(".crow").forEach(r => r.onclick = () => { $("chSel").value = r.dataset.c; scrollTo(0,0); });
 }
 $("expBtn").onclick = () => { const a = document.createElement("a");
