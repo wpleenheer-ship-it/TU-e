@@ -3,17 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TU/e Case Files — Practice Modules</title>
+    <title>TU/e Case Files — Investigation Board</title>
     <style>
         :root {
             --cork-bg: #8c6239;
-            --cork-dark: #5e3f22;
             --paper-bg: #f4eee1;
             --folder-bg: #e6ccb2;
+            --postit-bg: #fff68f;
+            --postit-border: #e6dc73;
             --red-string: #b81d13;
             --tape-color: rgba(235, 225, 195, 0.65);
             --ink-color: #1c1c1c;
             --stamp-red: #a31621;
+            --tue-red: #c8102e;
         }
 
         * {
@@ -33,17 +35,17 @@
             background-image: 
                 radial-gradient(rgba(0, 0, 0, 0.18) 15%, transparent 16%),
                 radial-gradient(rgba(255, 255, 255, 0.08) 15%, transparent 16%),
-                radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.55) 100%);
+                radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.6) 100%);
             background-size: 16px 16px, 16px 16px, 100% 100%;
             background-position: 0 0, 8px 8px, 0 0;
             border: 18px solid #3d2610;
-            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.7);
-            padding: 2rem;
+            box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.75);
+            padding: 3rem 2rem;
             position: relative;
             overflow-x: hidden;
         }
 
-        /* Caution tape across the top corner */
+        /* Caution tape across the top right corner */
         .caution-tape {
             position: fixed;
             top: 25px;
@@ -62,18 +64,73 @@
             user-select: none;
         }
 
+        /* Pinned TU/e Polaroid / Evidence Plaque in top-left */
+        .tue-plaque {
+            position: fixed;
+            top: 30px;
+            left: 35px;
+            background: #fdfbf7;
+            padding: 14px 18px 10px;
+            box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.5);
+            transform: rotate(-6deg);
+            z-index: 20;
+            border: 1px solid #d4cbb8;
+            text-align: center;
+            width: 170px;
+        }
+
+        /* Scotch tape effect on the TU/e plaque */
+        .tue-plaque::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%) rotate(3deg);
+            width: 75px;
+            height: 22px;
+            background: var(--tape-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
+            border-left: 1px dashed rgba(0, 0, 0, 0.1);
+            border-right: 1px dashed rgba(0, 0, 0, 0.1);
+        }
+
+        .tue-logo-box {
+            background: #fff;
+            border: 1px solid #eee;
+            padding: 10px 6px;
+            margin-bottom: 6px;
+        }
+
+        .tue-logo-text {
+            font-family: Arial, Helvetica, sans-serif;
+            font-weight: 900;
+            font-size: 2.2rem;
+            color: var(--tue-red);
+            letter-spacing: -1px;
+            line-height: 1;
+            margin: 0;
+        }
+
+        .tue-caption {
+            font-size: 0.65rem;
+            font-weight: bold;
+            color: #444;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
         /* Main pinned header note */
         .header-note {
             background: var(--paper-bg);
             padding: 1.5rem 3rem;
             box-shadow: 4px 8px 18px rgba(0, 0, 0, 0.45);
-            transform: rotate(-1.5deg);
+            transform: rotate(-1deg);
             position: relative;
             margin-bottom: 3.5rem;
             border: 1px solid #d4cbb8;
             text-align: center;
             z-index: 5;
-            max-width: 600px;
+            max-width: 620px;
         }
 
         .header-note h1 {
@@ -87,19 +144,19 @@
 
         .header-note p {
             margin: 0.6rem 0 0;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: #444;
             font-weight: bold;
         }
 
-        /* Thumbtack pin */
+        /* Thumbtack pins */
         .pin {
             width: 18px;
             height: 18px;
             border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #ff5252, #8b0000);
             position: absolute;
-            top: 12px;
+            top: 10px;
             left: 50%;
             transform: translateX(-50%);
             box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.5), inset -2px -2px 4px rgba(0, 0, 0, 0.4);
@@ -117,25 +174,29 @@
             background: rgba(255, 255, 255, 0.6);
         }
 
-        /* Board area containing the files and connecting string */
+        .pin.blue {
+            background: radial-gradient(circle at 30% 30%, #4da6ff, #004d99);
+        }
+
+        /* Board area containing the columns */
         .board-grid {
             display: flex;
-            gap: 4rem;
+            gap: 4.5rem;
             flex-wrap: wrap;
             justify-content: center;
-            align-items: stretch;
+            align-items: flex-start;
             position: relative;
-            max-width: 950px;
+            max-width: 1000px;
             width: 100%;
             z-index: 5;
         }
 
-        /* Red yarn connecting the pins */
-        .string-connector {
+        /* Horizontal red yarn connecting the main dossiers */
+        .string-horizontal {
             position: absolute;
-            top: 20px;
-            left: 20%;
-            right: 20%;
+            top: 18px;
+            left: 22%;
+            right: 22%;
             height: 3px;
             background-color: var(--red-string);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
@@ -144,10 +205,31 @@
             pointer-events: none;
         }
 
+        /* Column holding a Dossier + its connected NotebookLM note */
+        .case-column {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            width: 360px;
+        }
+
+        /* Vertical red yarn connecting the dossier to the NotebookLM note below */
+        .string-vertical {
+            width: 3px;
+            height: 45px;
+            background-color: var(--red-string);
+            box-shadow: 2px 0 4px rgba(0, 0, 0, 0.4);
+            z-index: 4;
+            transform: rotate(-4deg);
+            margin: -5px 0;
+            pointer-events: none;
+        }
+
         /* Dossier / Evidence Card */
         .case-file {
             background: var(--folder-bg);
-            width: 340px;
+            width: 100%;
             padding: 2.2rem 1.8rem 1.8rem;
             position: relative;
             box-shadow: 6px 10px 22px rgba(0, 0, 0, 0.5);
@@ -158,6 +240,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            z-index: 6;
         }
 
         /* Folder tab at the top left */
@@ -175,16 +258,16 @@
             border-radius: 6px 6px 0 0;
         }
 
-        .case-file:nth-child(2) {
-            transform: rotate(-2.5deg);
+        .case-column:nth-child(2) .case-file {
+            transform: rotate(-2deg);
         }
 
-        .case-file:nth-child(3) {
+        .case-column:nth-child(3) .case-file {
             transform: rotate(2deg);
         }
 
         .case-file:hover {
-            transform: scale(1.04) rotate(0deg);
+            transform: scale(1.03) rotate(0deg) !important;
             box-shadow: 10px 16px 28px rgba(0, 0, 0, 0.65);
             z-index: 15;
         }
@@ -194,9 +277,8 @@
             background: #fdfbf7;
             padding: 1.25rem;
             border: 1px solid #dcd7c9;
-            box-shadow: inset 0 0 10px rgba(0,0,0,0.04);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.04);
             position: relative;
-            flex-grow: 1;
         }
 
         .evidence-tag {
@@ -219,7 +301,7 @@
         .course-title {
             font-size: 0.95rem;
             line-height: 1.4;
-            margin: 0 0 1.2rem 0;
+            margin: 0 0 0.8rem 0;
             color: #333;
         }
 
@@ -232,7 +314,7 @@
             font-size: 0.8rem;
             text-transform: uppercase;
             letter-spacing: 1.5px;
-            transform: rotate(-6deg);
+            transform: rotate(-5deg);
             margin-top: 1rem;
             align-self: flex-end;
             opacity: 0.85;
@@ -243,12 +325,82 @@
             background-color: rgba(163, 22, 33, 0.08);
         }
 
-        @media (max-width: 768px) {
-            .string-connector {
+        /* Sticky Note for NotebookLM */
+        .notebook-note {
+            background: var(--postit-bg);
+            border: 1px solid var(--postit-border);
+            width: 88%;
+            padding: 1.4rem 1.2rem 1.1rem;
+            position: relative;
+            box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.45);
+            text-decoration: none;
+            color: var(--ink-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            z-index: 6;
+            display: block;
+        }
+
+        .case-column:nth-child(2) .notebook-note {
+            transform: rotate(3deg);
+        }
+
+        .case-column:nth-child(3) .notebook-note {
+            transform: rotate(-2.5deg);
+        }
+
+        .notebook-note:hover {
+            transform: scale(1.05) rotate(0deg) !important;
+            box-shadow: 8px 12px 22px rgba(0, 0, 0, 0.6);
+            z-index: 15;
+        }
+
+        .note-label {
+            font-size: 0.7rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            color: #555;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 0.3rem;
+        }
+
+        .note-title {
+            font-size: 1rem;
+            font-weight: bold;
+            margin: 0 0 0.4rem 0;
+            display: flex;
+            align-items: center;
+             justify-content: space-between;
+        }
+
+        .note-desc {
+            font-size: 0.8rem;
+            margin: 0;
+            color: #333;
+            line-height: 1.35;
+        }
+
+        .external-tag {
+            display: inline-block;
+            margin-top: 0.6rem;
+            font-size: 0.75rem;
+            font-weight: bold;
+            color: #004d99;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 900px) {
+            .tue-plaque {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 2rem;
+            }
+            .string-horizontal {
                 display: none;
             }
             .board-grid {
-                gap: 2.5rem;
+                gap: 3rem;
             }
         }
     </style>
@@ -257,36 +409,69 @@
 
     <div class="caution-tape">DO NOT CROSS // EXAM AREA</div>
 
+    <!-- Pinned TU/e Logo Polaroid on the wall -->
+    <div class="tue-plaque">
+        <div class="tue-logo-box">
+            <div class="tue-logo-text">TU/e</div>
+        </div>
+        <div class="tue-caption">Eindhoven Univ. of Tech.<br>HQ Evidence Board</div>
+    </div>
+
     <div class="header-note">
         <div class="pin"></div>
         <h1>TU/e Investigation Board</h1>
-        <p>SELECT A CASE FILE TO BEGIN INTERROGATION (PRACTICE)</p>
+        <p>SELECT A CASE FILE TO BEGIN INTERROGATION OR CONSULT INTEL ARCHIVES</p>
     </div>
 
     <div class="board-grid">
-        <div class="string-connector"></div>
+        <div class="string-horizontal"></div>
 
-        <!-- Case 1: 1ZV60 -->
-        <a href="1ZV60_oefenmodule.html" class="case-file" data-tab="CASE #1ZV60">
-            <div class="pin"></div>
-            <div class="inner-sheet">
-                <span class="evidence-tag">EXHIBIT A // Q1</span>
-                <h2 class="course-code">1ZV60</h2>
-                <p class="course-title">Methodology for IE Research</p>
-            </div>
-            <span class="stamp">Open Dossier &rarr;</span>
-        </a>
+        <!-- Column 1: 1ZV60 -->
+        <div class="case-column">
+            <a href="1ZV60_oefenmodule.html" class="case-file" data-tab="CASE #1ZV60">
+                <div class="pin"></div>
+                <div class="inner-sheet">
+                    <span class="evidence-tag">EXHIBIT A // Q1</span>
+                    <h2 class="course-code">1ZV60</h2>
+                    <p class="course-title">Methodology for IE Research</p>
+                </div>
+                <span class="stamp">Start Practice &rarr;</span>
+            </a>
 
-        <!-- Case 2: 1JV00 / 1JP00 -->
-        <a href="WOP_practice_module.html" class="case-file" data-tab="CASE #1JP00">
-            <div class="pin"></div>
-            <div class="inner-sheet">
-                <span class="evidence-tag">EXHIBIT B // Q1</span>
-                <h2 class="course-code">1JP00 / 1JV00</h2>
-                <p class="course-title">Work and Organisational Psychology</p>
-            </div>
-            <span class="stamp">Open Dossier &rarr;</span>
-        </a>
+            <div class="string-vertical"></div>
+
+            <a href="https://notebook.google.com/notebook/a0256e2e-1ec2-4b63-bb7d-2d7f0f85b054" target="_blank" rel="noopener noreferrer" class="notebook-note">
+                <div class="pin blue"></div>
+                <span class="note-label">Evidence Log // NotebookLM</span>
+                <h3 class="note-title">1ZV60 Intel &amp; Notes</h3>
+                <p class="note-desc">Stored background information, course sources, and extra practice exercises.</p>
+                <span class="external-tag">Access Informant File &nearr;</span>
+            </a>
+        </div>
+
+        <!-- Column 2: 1JP00 / 1JV00 -->
+        <div class="case-column">
+            <a href="WOP_practice_module.html" class="case-file" data-tab="CASE #1JP00">
+                <div class="pin"></div>
+                <div class="inner-sheet">
+                    <span class="evidence-tag">EXHIBIT B // Q1</span>
+                    <h2 class="course-code">1JP00 / 1JV00</h2>
+                    <p class="course-title">Work and Organisational Psychology</p>
+                </div>
+                <span class="stamp">Start Practice &rarr;</span>
+            </a>
+
+            <div class="string-vertical"></div>
+
+            <a href="https://notebook.google.com/notebook/100dc8ec-7d62-480a-8497-aa8cbeab4513" target="_blank" rel="noopener noreferrer" class="notebook-note">
+                <div class="pin blue"></div>
+                <span class="note-label">Evidence Log // NotebookLM</span>
+                <h3 class="note-title">1JP00 Intel &amp; Notes</h3>
+                <p class="note-desc">Stored background information, course sources, and extra practice exercises.</p>
+                <span class="external-tag">Access Informant File &nearr;</span>
+            </a>
+        </div>
+
     </div>
 
 </body>
