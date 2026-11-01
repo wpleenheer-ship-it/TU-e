@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Practice module – Industrial &amp; Organizational Psychology</title>
+<style>
+/* ===== Design tokens: navy / slate / emerald, automatic dark mode ===== */
+:root{
+  --bg:#f3f5f8; --surface:#ffffff; --surface2:#eaeef4; --text:#17233a; --muted:#5b6b82;
+  --line:#d5dce7; --navy:#1b2f55; --navy-ink:#ffffff; --accent:#0f8a63; --accent-soft:#bfe6d6;
+  --good:#0f8a63; --good-bg:#dff3ea; --bad:#c23b3b; --bad-bg:#fbe3e3; --focus:#2f6fd6;
+  --radius:12px; --shadow:0 1px 2px rgba(23,35,58,.06),0 6px 18px rgba(23,35,58,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#0e1626; --surface:#16213a; --surface2:#1d2b4a; --text:#e6ecf7; --muted:#9db0cc;
+    --line:#2b3b5e; --navy:#6c93e0; --navy-ink:#0e1626; --accent:#34c58f; --accent-soft:#1d5a46;
+    --good:#34c58f; --good-bg:#12392f; --bad:#ef7676; --bad-bg:#40202a; --focus:#7aa6ff;
+    --shadow:none;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);
+  font:16px/1.55 "Source Sans 3",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+h1,h2,h3{font-family:Georgia,"Iowan Old Style","Times New Roman",serif;line-height:1.25;margin:0}
+button{font:inherit;color:inherit;cursor:pointer}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+.wrap{max-width:820px;margin:0 auto;padding:24px 16px 64px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:20px;box-shadow:var(--shadow)}
+.stack>*+*{margin-top:16px}
+.muted{color:var(--muted)}
+.hidden{display:none!important}
+
+/* Buttons */
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:10px 16px;font-weight:600}
+.btn:hover{background:var(--surface2)}
+.btn.primary{background:var(--navy);color:var(--navy-ink);border-color:var(--navy)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.danger{color:var(--bad)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+
+/* Header */
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:18px}
+.top h1{font-size:1.65rem;color:var(--navy)}
+.top p{margin:4px 0 0}
+
+/* Start screen */
+.section-title{font-size:1.1rem;margin-bottom:10px}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:10px;padding:8px 10px;text-align:left}
+.chip small{display:block;color:var(--muted)}
+.chip[aria-pressed="true"]{border-color:var(--accent);background:var(--good-bg)}
+.chip.wide{grid-column:1/-1;font-weight:700}
+.chip[disabled]{opacity:.4;cursor:not-allowed}
+.seg{display:inline-flex;border:1.5px solid var(--line);border-radius:10px;overflow:hidden;flex-wrap:wrap}
+.seg button{border:0;background:var(--surface);padding:8px 16px;font-weight:600}
+.seg button+button{border-left:1.5px solid var(--line)}
+.seg button[aria-pressed="true"]{background:var(--navy);color:var(--navy-ink)}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+.opt-group label.lbl{display:block;font-weight:600;margin-bottom:6px}
+
+/* Dashboard */
+.overall{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.overall strong{font-size:1.4rem;font-family:Georgia,serif}
+.bar{position:relative;height:12px;border-radius:99px;background:var(--surface2);overflow:hidden}
+.bar .seen{position:absolute;inset:0 auto 0 0;background:var(--accent-soft)}
+.bar .mastered{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin:10px 0}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.chrow{display:grid;grid-template-columns:116px 1fr 74px;gap:10px;align-items:center;width:100%;
+  border:0;background:transparent;padding:6px 8px;border-radius:8px;text-align:left}
+.chrow:hover{background:var(--surface2)}
+.chrow[disabled]{opacity:.45;cursor:default}
+.chrow .lab{font-weight:600}
+.chrow .num{font-size:.85rem;color:var(--muted);text-align:right}
+.tick{color:var(--good);font-weight:800}
+.tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px}
+
+/* Quiz */
+.qhead{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px}
+.score b.g{color:var(--good)} .score b.r{color:var(--bad)}
+.qtext{font-size:1.2rem;margin:18px 0 14px;font-family:Georgia,serif}
+.qmeta{color:var(--muted);font-size:.9rem}
+.options{display:grid;gap:10px}
+.option{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;border:1.5px solid var(--line);
+  background:var(--surface);border-radius:10px;padding:12px 14px}
+.option:hover:not([disabled]){border-color:var(--navy);background:var(--surface2)}
+.option .ltr{flex:none;width:28px;height:28px;border-radius:50%;background:var(--surface2);display:grid;place-items:center;font-weight:700}
+.option.correct{border-color:var(--good);background:var(--good-bg)}
+.option.correct .ltr{background:var(--good);color:var(--navy-ink)}
+.option.wrong{border-color:var(--bad);background:var(--bad-bg)}
+.option.wrong .ltr{background:var(--bad);color:var(--navy-ink)}
+.option[disabled]{cursor:default}
+.feedback{margin-top:16px;padding:12px 14px;border-radius:10px;border-left:5px solid var(--good);background:var(--good-bg)}
+.feedback.bad{border-left-color:var(--bad);background:var(--bad-bg)}
+.feedback p{margin:4px 0 0}
+.actions{display:flex;justify-content:space-between;gap:10px;margin-top:18px;flex-wrap:wrap}
+.kbd{font-size:.8rem;color:var(--muted);margin-top:12px}
+
+/* Results */
+.big{font-family:Georgia,serif;font-size:2.6rem;color:var(--navy)}
+.wrong-item{border-top:1px solid var(--line);padding:12px 0}
+.wrong-item:first-child{border-top:0}
+.wrong-item .ans{color:var(--good);font-weight:600}
+.wrong-item .you{color:var(--bad)}
+canvas#confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+@media (max-width:520px){.chrow{grid-template-columns:92px 1fr 62px}.qtext{font-size:1.08rem}}
+</style>
+</head>
+<body>
+<canvas id="confetti" aria-hidden="true"></canvas>
+<div class="wrap" id="app"></div>
+
+<script>
+/* =====================================================================
+   CONFIG – change the course info here
+   ===================================================================== */
+const COURSE = {
+  title: "Industrial & Organizational Psychology",
+  book: "Work in the 21st Century (Landy & Conte, 4th ed., 2013)",
+  // Course code / university: fill in if you want them shown in the header.
+  code: "", university: ""
+};
+const STORAGE_KEY = "io-psych-practice-v1";
+const MASTERED_MIN_ATTEMPTS = 2;      // minimum attempts for "mastered"
+const MASTERED_MIN_RATIO = 0.9;       // minimum fraction correct for "mastered"
+const CHAPTER_LEARNED_RATIO = 0.9;    // fraction of mastered questions for a chapter to be "learned"
+
+/* =====================================================================
+   QUESTION DATA
+   Generated programmatically from the PDF (pdftotext + parse script).
+   Add your own with:  Q(chapter, "question", ["option a","option b","option c","option d"], correctIndex, "rationale");
+   correctIndex is 0-based (0 = a). The chapter menu builds itself from this data.
+   The source PDF contains no rationales, so rationale is empty unless the PDF had a note.
+   ===================================================================== */
+const QUESTIONS = [];
+const _chapterCounter = {};
+function Q(chapter, question, options, correctIndex, rationale = "") {
+  _chapterCounter[chapter] = (_chapterCounter[chapter] || 0) + 1;
+  QUESTIONS.push({
+    id: chapter + "-" + _chapterCounter[chapter],      // stable id: chapter-number as in the PDF
+    chapter, question,
+    options: options.map((text, i) => ({ letter: "abcdefgh"[i], text })),
+    correctAnswer: "abcdefgh"[correctIndex],
+    rationale
+  });
+}
+Q(1, "Which of the following is not one of the three major concentrations of I-O psychology?", ["personnel psychology", "industrial technology", "human engineering", "organizational psychology"], 1, "");
+Q(1, "Motivation, stress, leadership, and teamwork are addressed by:", ["personnel psychology", "industrial technology", "human engineering", "organizational psychology"], 3, "");
+Q(1, "The Hawthorne studies were used to examine the effects of:", ["revery obsession", "mass group testing", "manipulating workplace lighting", "time and motion"], 2, "");
+Q(1, "I-O psychology is defined as:", ["the influence of an individual's personality on work and non-work behaviors.", "the application of psychological principles, theory, and research to the work setting.", "the concept of contextual work and organizational citizenship behavior.", "the study of ways to maximize productivity."], 1, "");
+Q(1, "All of the following studies examined productivity in the workplace except:", ["time and motion", "revery obsession", "Hawthorne studies", "Stanford-Binet"], 3, "");
+Q(1, "When individuals from different geographic locations work together, it is known as:", ["telecommuting", "virtual teams", "digitization", "welfare-to-work"], 1, "");
+Q(1, "An expatriate is:", ["the distribution of emotional roles between genders", "a manager or professional assigned to work abroad", "a culture that minimizes distances between individuals", "a culture that depends on the distances between individuals"], 1, "");
+Q(1, "Which of the following countries has a collectivist culture?", ["United States", "German", "Japan", "France"], 2, "");
+Q(1, "Which of the following is not one of the dimensions in Hofstede's theory of culture?", ["power distance", "uncertainty avoidance", "conscientiousness", "masculinity/femininity"], 2, "");
+Q(1, "The \"West versus the Rest\" mentality refers to the:", ["degree to which individuals are expected to look after themselves versus the group.", "degree to which members of a culture feel comfortable in unpredictable situations.", "extent of immediate versus delayed gratification of members of a culture.", "tendency to apply American theories to non-American situations."], 3, "");
+Q(2, "All of the following methods are common to all sciences except:", ["Science depends on data.", "Science sets out to prove theories or hypotheses.", "Science must be communicable, open, and public.", "Scientists should be objective and not influenced by biases or prejudices."], 1, "");
+Q(2, "Dr. Groeneveld is not able to include any treatments or conditions in an investigation of a new pay plan. Instead, he is gathering information about the effects of a new pay plan and making systematic observations about changes in performance based on this new pay plan. This type of research would best be classified as a(n) _____________.", ["Quasi-experimental design", "Experimental design", "Non-experimental design", "Survey design"], 2, "");
+Q(2, "Dr. Brown is conducting a scientific experiment and has randomly assigned the participants into two training groups, which receive training programs. What type of research design is Dr. Brown using?", ["Quasi-experimental design", "Experimental design", "Non-experimental design", "Survey design"], 1, "");
+Q(2, "In I-O psychology, field studies are often non-experimental in design. All of the following help explain the popularity of non-experimental field studies except:", ["The extent to which a laboratory experiment can reasonably simulate \"work\" is limited.", "Laboratory experiments are more likely to use samples that are not representative of the population to which I-O psychologists would like to generalize.", "Non-experimental designs in the field are most effective in leading to causal explanations.", "In the field, workers can seldom be randomly assigned to conditions or treatments."], 2, "");
+Q(2, "_____________ methods rely heavily on tests, rating scales, questionnaires, and physiological measures, while _____________ methods of investigation generally produce flow diagrams and narrative descriptions of events or processes.", ["Objective; Subjective", "Subjective; Objective", "Qualitative; Quantitative", "Quantitative; Qualitative"], 3, "");
+Q(2, "Dr. Young is in the process of combining information from multiple sources to test a theory. According to Rogelberg and Brooks-Laber (2002), this approach is referred to as _____________.", ["Triangulation", "Unification", "Mergence", "Convergence"], 0, "");
+Q(2, "Each of the following is directly related to increasing the extent to the results of a study can be generalized to a larger population except:", ["Collecting data at several different points in time.", "Using a representative sample of the population being studied.", "Making the sample size larger.", "Collecting data from many different organizations."], 2, "");
+Q(2, "All of the following are characteristics that can be used to describe a score distribution except:", ["Mean", "Significance", "Skew", "Median"], 1, "");
+Q(2, "Inferential statistics are used to:", ["extrapolate data into the future.", "compare the results of different analyses.", "reveal patterns in a set of data.", "draw a conclusion based on results from sample data."], 3, "");
+Q(2, "A correlation of r = −.79 indicates that there is a", ["high negative association between two variables.", "high positive association between two variables.", "low negative association between two variables.", "low positive association between two variables."], 0, "");
+Q(3, "All of the following are fundamental assumptions that I-O psychologists make when they apply the individual differences model except:", ["The attribute levels of various people in a group can be brought to the same level through training.", "Different jobs require different attributes.", "Adults have a variety of attributes, the levels of which remain relatively stable over time.", "The attributes can be measured accurately."], 0, "");
+Q(3, "Fleishman's taxonomy of 52 abilities can be divided into the categories of cognitive abilities, perceptual-motor abilities, and _____________.", ["Problem solving abilities.", "Emotional abilities.", "Performance abilities.", "Physical abilities."], 3, "");
+Q(3, "Measures of \"g\" assess all of the following except:", ["Knowledge acquisition.", "Perceptual ability.", "Reasoning ability.", "Problem-solving ability."], 1, "");
+Q(3, "As the complexity of a job _____________, the predictive value of general intelligence tests _____________.", ["increases; stays the same.", "increases; decreases.", "increases; increases.", "decreases; stays the same."], 2, "");
+Q(3, "Which of the following is false concerning the Five Factor Model?", ["It gives a representation of how a person typically responds to people and events.", "It describes the potential importance of personality variables in understanding job performance.", "It is the result of both statistical analyses and a conceptual analysis.", "It can be used to identify evidence of psychopathology."], 3, "");
+Q(3, "Colleen and her colleagues have noticed that a particular employee has a very high level of integrity. The employee would be most expected to rank high on all of the following factors of the Five Factor Model except:", ["Extraversion", "Emotional Stability", "Agreeableness", "Conscientiousness"], 0, "");
+Q(3, "Which of the following is false concerning faking on a personality test?", ["It may not be faking since personality is all about self-presentation.", "There is currently no way to measure if someone is faking a personality test.", "One perspective says there is not much to distinguish self-efficacy from faking.", "Some people try to respond simply as the ideal candidate."], 1, "");
+Q(3, "Skills are _____________.", ["Practiced acts.", "Innate abilities.", "Always technically-based.", "Not dependent on certain abilities."], 0, "");
+Q(3, "Caroline possesses a combination of skills, knowledge, abilities, and personality characteristics that allow him to complete his project management tasks. What are the sets of behaviors called that allow him to do his job well?", ["Proficiencies", "Competencies", "Behavioral categories", "Individual difference characteristics"], 1, "");
+Q(3, "A test battery is a", ["method of combining incongruent test results.", "special tool used to administer a test.", "test taken over a very long period of time (e.g., 2 years).", "collection of tests rather than a single test."], 3, "");
+Q(3, "All of the following are true of speed tests except:", ["They have rigid and demanding time limits.", "They may reduce the risk of legal challenges.", "Most test takers are unable to finish them in the allotted time.", "The emphasis on speed may introduce unfairness."], 1, "");
+Q(3, "Which of the following is false concerning tests of psychomotor abilities?", ["They may involve complex tasks or simple actions.", "They usually involve a task that requires dexterity.", "They involve the coordinated movement of the limbs.", "Ideally, they should be administered for all jobs."], 3, "");
+Q(3, "_____________ identify signs of psychopathology, while _____________ identify variations of normal personality.", ["Screen out tests; Screen in tests", "Screen in tests; Screen out tests", "Psychometric tests; Norm tests", "Norm tests; Psychometric tests"], 0, "");
+Q(3, "All of the following are criticisms of individual assessment except:", ["It is not validated as rigorously as other traditional forms of assessment.", "Too little emphasis is placed on personality attributes.", "Assessment summaries may only be influenced by one or two parts of the process.", "Many individual assessments invade the privacy of the candidate."], 1, "");
+Q(3, "Sarah, in an interview for a Disc Jockey position, was asked to describe how she would respond to a dissatisfied client. She most likely experienced what type of interview?", ["Behavioral interview", "Hypothetically-based interview", "Situational interview", "Unstructured interview"], 2, "");
+Q(3, "In a work sample test, the task assigned and the equipment used to complete the task:", ["Are very general so the test can be used for any position.", "Will often lead to non-valid results.", "Should only be somewhat relevant to the actual job.", "Are designed to be realistic simulations of the actual job."], 3, "");
+Q(3, "Dominic has interviewed and given a paper and pencil test to a number of people applying for a job at his company. He notices that the validity of the paper and pencil test of general mental ability is moderate, and that the validity of the test combined with the interview is significantly higher. He might conclude that the value of the interview is:", ["negligible.", "incremental.", "observable.", "nonexistent."], 1, "");
+Q(3, "Graphology:", ["assesses traits based on the characteristics of a person's handwriting.", "is the study of graphs.", "is a valid predictor of job performance.", "assesses personality through vocal intonations."], 0, "");
+Q(3, "The outcomes most commonly predicted by drug tests are:", ["Poor performance and apathy.", "Voluntary terminations and aggression.", "Absenteeism and involuntary terminations.", "Absenteeism and poor performance."], 2, "");
+Q(4, "All of the following are direct determinants of job performance except:", ["motivation.", "procedural knowledge and skill.", "personality factors.", "declarative knowledge."], 2, "");
+Q(4, "According to Campbell, which of the following is a performance component that is essential at some level for every job?", ["Demonstrated effort.", "Motivation.", "Personal accountability.", "General proficiency."], 0, "");
+Q(4, "A help-desk operator's performance at Chips and Bytes Computer Company is evaluated by assessing the number of calls he takes on any given day. The other aspects of his job (e.g., customer satisfaction) are not included. The resulting performance measure would be considered a(n) _____________.", ["Actual criterion", "Ultimate criterion", "Contaminated criterion", "Deficient criterion"], 3, "");
+Q(4, "John works at Lunar Company as an administrative assistant. He often volunteers to do additional tasks to help others and consistently puts in extra effort in completing his own tasks. This is an example of _____________.", ["organizational citizenship behavior.", "task performance.", "adaptive performance.", "overall performance."], 0, "");
+Q(4, "All of the following are aspects of organizational citizenship behavior except:", ["Altruism toward individuals in the organization", "Responsibility", "Generalized compliance", "Altruism toward groups within the organization"], 1, "");
+Q(4, "All of the following are circumstances of today's workplace that seem to require adaptive performance except:", ["Reliance on the status quo", "Globalization", "Changing technologies", "Corporate restructuring"], 0, "");
+Q(4, "Sheryl is frustrated with her job and, in recent weeks, has been sabotaging the projects of her coworkers. This is an example of _____________.", ["revenge", "performance monitoring", "hostile action", "counterproductive behavior"], 3, "");
+Q(4, "All of the following are purposes of a job analysis except:", ["To determine the necessary human attributes.", "To determine how tasks are carried out.", "To decide who to hire for a position.", "To understand the important tasks of a job."], 2, "");
+Q(4, "All of the following may be potential distorting influences in job analysis data collection except:", ["The desire to make one's own job look more difficult.", "Objective reporting by the SME.", "The desire of the SME to conform to what others report.", "Mere carelessness."], 1, "");
+Q(4, "What is cognitive task analysis?", ["A method of distilling job performance into measurable units.", "A precursor to the think-aloud protocol.", "A job analysis method that focuses on specific tasks.", "A technique used to quantify job analysis information."], 0, "");
+Q(5, "Which of the following is false concerning performance measures?", ["Relationships among different types are generally low to moderate.", "They are interchangeable and may be substituted for one another.", "Each type gives a different perspective on performance.", "There are low correlations between supervisory ratings and objective measures."], 1, "");
+Q(5, "All of the following are likely to make employees feel more positively toward performance monitoring except:", ["They believe the activities monitored are job relevant.", "They are able to delay or prevent monitoring at particular times", "They are aware when it is taking place so they can censor their actions.", "They are able to participate in the design of the monitoring system."], 2, "");
+Q(5, "Performance _____________ systems are developed by HR and handed to managers to use in evaluation of subordinates; performance _____________ feedback occurs whenever a supervisor or subordinate feels a discussion about expectations and performance is necessary.", ["criteria; management", "management; criteria", "appraisal; management", "management; appraisal"], 2, "");
+Q(5, "A performance rating form used for administrative purposes would be least valid for which of the following circumstances?", ["Salary adjustment", "Employee feedback", "Promotion", "Firing"], 1, "");
+Q(5, "Which of the following is false concerning task-based ratings?", ["They tend to be the most easily defended in court.", "They are generally most easily accepted by incumbents.", "The rating systems are usually direct extensions of job analysis.", "They rely on some trait analysis for accuracy."], 3, "");
+Q(5, "When central tendency error occurs, it is often observed that:", ["average performers receive the best scores.", "an extreme score is avoided in favor of a \"safe\" score.", "average performers are favored.", "extreme scores are chosen to move people away from the mean."], 1, "");
+Q(5, "Julie is reluctant to assign bad ratings for her subordinates for fear of \"ruffling feathers.\" As a result, she tends to be unusually easy in her ratings. Julie is committing what type of error?", ["Central tendency error", "Halo error", "Leniency error", "Severity error"], 2, "");
+Q(5, "In looking at how judges perceive performance evaluation, the characteristics most commonly cited in court decisions include all of the following except:", ["whether raters were consistent over time.", "whether a job analysis was used to develop the system.", "whether the raters were given written instructions.", "whether multiple raters agreed on the ratings."], 0, "");
+Q(6, "Which of the following is least likely to be a high performance work practice?", ["Use of formal job analyses", "Merit based promotions", "Use of clinical decision making to hire for line jobs", "Use of formal assessment devices for selection"], 2, "");
+Q(6, "What is the relationship called between the number of individuals actually hired and the number assessed?", ["Selection ratio", "Assessment ratio", "Correlate ratio", "Applicant ratio"], 0, "");
+Q(6, "Dana was recently hired by Solar Company after going through its staffing process. Her test results placed her above the cut score. Unfortunately, her performance has been less than satisfactory and Dana's manager is beginning to think that the wrong person was hired. Dana's case might be an example of what type of error?", ["False negative", "True negative", "False positive", "True positive"], 2, "");
+Q(6, "What is one consequence of increasing a cut score?", ["Fewer hires will be above average performers", "Fewer candidates need be assessed", "More false positive errors", "More false negative errors"], 3, "");
+Q(6, "An organization is looking to hire individuals to fill 8 positions. So far, 20 people have applied for these jobs. What is the selection ratio?", [".40", ".44", "2.25", "2.50"], 0, "");
+Q(6, "In _____________ decision making, information is combined according to a mathematical formula. In _____________ decision making, the relative value of one candidate versus another is weighed in the decision maker's head.", ["statistical; actuarial", "actuarial; statistical", "clinical; statistical", "statistical; clinical"], 3, "");
+Q(6, "The staffing system at Modular Company involves a process whereby a candidate must successfully pass a cognitive ability test before being allowed to take the physical ability test. This is an example of a _____________.", ["compensatory system.", "hurdle system.", "multiple hurdle system.", "paired system."], 1, "");
+Q(6, "There are three different strategies for achieving an optimal fit between an applicant and a job opening. They include all of the following except:", ["Fill each job with the most qualified person.", "Fill each job with candidates that get along with current employees.", "Place candidates according to their best talents.", "Place workers so that all jobs are filled with adequate talent."], 1, "");
+Q(6, "An industrial plant has just been sued for racial discrimination in promotion decisions by a group of Hispanic workers. They allege that White workers have been promoted at a higher rate than Hispanic workers. Which one of the following, based on the 80% rule, would indicate that there is adverse impact against the Hispanic workers?", ["Hispanic promotion rate: 19%, White promotion rate: 20%", "Hispanic promotion rate: 30%, White promotion rate: 35%", "Hispanic promotion rate: 20%, White promotion rate: 30%", "Hispanic promotion rate: 75%, White promotion rate: 85%"], 2, "");
+Q(6, "A company administered a test to a group of job candidates two months ago. In examining the data, an HR representative discovered that a protected group tended not to do as well on the test as the majority group. This might be an example of what type of discrimination?", ["Intentional discrimination", "Adverse treatment", "Adverse impact", "This does not qualify as discrimination."], 2, "");
+Q(7, "_____________ is a relatively permanent change in behavior and human characteristics, while _____________ is the systematic acquisition of skills, concepts, or attitudes that results in improved performance in another environment.", ["Teaching; learning", "Learning; teaching", "Learning; training", "Training; learning"], 2, "");
+Q(7, "All of the following are considered broad categories of learning outcomes except:", ["Skill-based outcomes", "Declarative outcomes", "Cognitive outcomes", "Affective outcomes"], 1, "");
+Q(7, "Mary, an HR professional, is currently attending a training program where she is learning how to use a new computer program. She is not averse to making mistakes, often using them as an opportunity to further understand the computer program and add to her own knowledge. Mary might be characterized as having a _____________.", ["limited orientation.", "cognitive orientation.", "performance orientation.", "mastery orientation."], 3, "");
+Q(7, "John's company offers a variety of training methods to learn skills. He is currently participating in one program that is often used to prepare high-potential employees for future management responsibilities, providing him with a variety of experiences in different departments that will likely help him obtain future promotions. What type of training method is he most likely participating in?", ["Classroom instruction", "Mentoring", "Apprenticeship", "Job rotation"], 3, "");
+Q(7, "Julie is currently in a training program for all managers at a certain level in her company. All of the trainees are exposed to the same material which is presented in a very sequential manner. Whether or not she grasps a specific concept is of no consequence to the presentation of the material. What type of programmed instruction is she most likely experiencing?", ["Branching programming", "Linear programming", "Inclusive programming", "Reinforcement programming"], 1, "");
+Q(7, "What distinguishes critical thinking from ordinary thought?", ["It requires active involvement in applying the principles under discussion.", "It involves the simple memorization of facts or principles.", "It takes a lot longer to do than ordinary thought.", "It is currently a basic tenet for learning in all areas."], 0, "");
+Q(7, "Utility analysis is a technique that assesses:", ["the return on investment of training.", "the overall usefulness of a training program.", "how easy it is to implement a training program.", "assesses the influence of training on performance."], 0, "");
+Q(7, "All of the following are true concerning 360 degree feedback except:", ["Raters who give feedback anonymously are more likely to be honest and open.", "To help with development, feedback should be timely.", "It describes the process of collecting feedback from a variety of sources.", "A recipient is likely to be more open if others are present to hear the feedback."], 3, "");
+Q(7, "Josh works in the HR department of Lunar Company and has been asked to take steps to prevent sexual harassment. He might choose to do all of the following except:", ["Establish an effective complaint or grievance process.", "Educate only the male employees on sexual harassment.", "Clearly communicate Lunar Company's zero tolerance policy to employees.", "Take immediate and appropriate action when an employee complains."], 1, "");
+Q(8, "Motivation concerns the conditions responsible for variations in intensity, quality, and _____________ of ongoing behavior.", ["amplitude", "satisfaction", "direction", "learning"], 2, "");
+Q(8, "What type of motivational approach placed the emphasis for behavior and directed activity directly on the environment?", ["Behaviorist approach", "Instrumental approach", "Nature approach", "Environmental approach"], 0, "");
+Q(8, "Which theory proposed that various forces in the psychological environment have valence?", ["Instinct theory", "Maslow's need theory", "Field theory", "Metaphor theory"], 2, "");
+Q(8, "What is the basic model for considering the role of motivation in performance?", ["Performance = (Motivation × Ability) + Situational constraints", "Performance = (Motivation × Ability) − Situational constraints", "Performance = (Motivation × Situational constraints) + Ability", "Performance = (Motivation / Situational constraints) + Ability"], 1, "");
+Q(8, "Maslow's model fits the person-as-machine metaphor well. Which of the following is false concerning the model?", ["A person will respond to whatever satisfies the lowest level unfulfilled need.", "Workers in the same department are assumed to be at the same needs level.", "The behavior of the individual is unconscious and automatic.", "An employer needs to know at what need level a worker is operating."], 1, "");
+Q(8, "What is a major problem associated with using contingent reinforcement?", ["The approach cannot consistently predict motivation.", "The approach makes too many assumptions of behavior.", "The approach has little or no role for any cognitive activity.", "The approach is not applicable in today's workplace."], 2, "");
+Q(8, "What is the theory called that suggests that tension exists when individuals hold incompatible thoughts?", ["Dissonance theory", "Equity theory", "Comparison theory", "Incompatibility theory"], 0, "");
+Q(8, "The feedback loop in goal setting theory deals with the discrepancy between:", ["Actual goal accomplishment and expected goal accomplishment of peers.", "Actual goal accomplishment and the failures the person has experienced.", "Actual goal accomplishment and the goal to which the person was committed.", "Actual goal accomplishment and the actual goal accomplishment of peers."], 2, "");
+Q(8, "Managers, across all cultures, tend to employ all of the following motivational practices except:", ["Quality improvement interventions", "Differential distribution of rewards", "Setting goals and making decisions for employees.", "Design and redesign of jobs and organizations."], 2, "");
+Q(9, "John, in a meeting with his boss, was elated to hear that the president of the company was impressed with his contribution. However, when he left the meeting and was sitting in his office, John began to experience feelings of anger. What theory would most support John's circumstances?", ["Nine-factor theory", "Facet satisfaction theory", "Dissatisfaction theory", "Opponent process theory"], 3, "");
+Q(9, "All of the following are true of the Job Descriptive Index except:", ["It includes a separate overall satisfaction measure.", "It doesn't provide much information about issues like independence.", "The actual questionnaire is fairly short.", "It assesses satisfaction with five distinct areas of work."], 2, "");
+Q(9, "_____________ is related to the work that individuals do, while _____________ concerns whether employees are satisfied with aspects such as pay or benefits.", ["Extrinsic satisfaction; intrinsic satisfaction", "Intrinsic satisfaction; extrinsic satisfaction", "Facet satisfaction; extrinsic satisfaction", "Extrinsic satisfaction; facet satisfaction"], 1, "");
+Q(9, "Sharon, a manager at Solar Corp., has noticed that one of her employees has become listless on the job, often putting minimal effort into simple projects. Sharon has spoken to the employee, but the employee has displayed a general unwillingness to change. The employee is most likely experiencing _____________.", ["resigned work satisfaction.", "constructive work dissatisfaction.", "boredom with his/her tasks.", "a reduced interest in success."], 0, "");
+Q(9, "_____________ are generalized feeling states that are not intense enough to interrupt ongoing work, whereas _____________ are normally associated with specific events or occurrences.", ["Emotions; Moods", "Moods; Emotions", "Feelings; Moods", "Moods; Feelings"], 1, "");
+Q(9, "Which of the following statements is incorrect concerning affectivity?", ["Positive people tend to be more satisfied with their jobs than negative people.", "Affectivity as measured in adolescence predicts later job satisfaction.", "Neuroticism is often referred to as positive affectivity.", "Job satisfaction and affectivity have reciprocal influences on each other."], 2, "");
+Q(9, "All of the following are elements of core evaluations except:", ["Locus of control", "Self-efficacy", "Stimuli observation", "Absence of neuroticism"], 2, "");
+Q(9, "Organizational commitment includes all of the following elements except:", ["A desire to contribute positively to the work-life of others.", "Acceptance and belief in an organization's values.", "A strong desire to remain in the organization.", "A willingness to exert effort on behalf of the organization."], 0, "");
+Q(9, "All of the following are reasons why the effects of unemployment are complex except:", ["There are fewer decisions to make since there is little to decide about.", "The loss of work reduces income and daily variety.", "There is a suspension of the typical goal setting that guides day to day activity.", "New skills are developed while current skills begin to atrophy."], 3, "");
+Q(9, "Multiple roles for both men and women enhance feelings of well-being through all of the following mechanisms except:", ["Success in one role can buffer the effects of failure in another role.", "Multiple roles increase the opportunity for social support.", "Multiple roles allow an individual to focus more on work success.", "Multiple roles increase an individual's cognitive complexity."], 2, "");
+Q(10, "_____________ provides challenges that motivate individuals to work hard and meet their goals, while _____________ results from stressful situations that persist over time and produces negative health outcomes.", ["Eustress; stress", "Stress; eustress", "Distress; eustress", "Eustress; distress"], 3, "");
+Q(10, "All of the following are true of the General Adaptation Syndrome except:", ["The sequence of stages varies depending on the trauma.", "In the alarm stage, the body releases stress hormones.", "While coping with the source of stress, resistance to other stressors decreases.", "Burnout, illness, and death may result unless stress is reduced."], 0, "");
+Q(10, "Problem-focused coping:", ["involves avoiding and minimizing the problem.", "has to do with reducing the emotional response to the problem.", "involves creating a new and larger problem as a distraction.", "is directed at managing the problem that is causing the stress."], 3, "");
+Q(10, "Josh works at Lunar Company and has just been assigned to a very important project that will require a great deal of time and dedication. He has also just been elected president of the parent association at his daughter's school. Josh doesn't know how he will be able to handle them both. What might this be an example of?", ["Role conflict", "Role ambiguity", "Job overload", "Job ambiguity"], 0, "");
+Q(10, "A moderator is _____________.", ["a variable that affects the direction or strength of the association between two other variables.", "an objective element in the stressor-strain relationship that starts the stress reaction in individuals.", "a method by which an individual can consciously halt the stressor-strain reaction.", "an element that recognizes the relationship between two variables and serves to magnify the strength of the variables."], 0, "");
+Q(10, "All of the following are characteristics of a person described as having a hardy personality except:", ["The feel a sense of commitment to their goals.", "They feel they are in control of their lives.", "They are critical of their environment.", "They see unexpected change as a challenge."], 2, "");
+Q(10, "Which strategy is concerned with modifying or eliminating stressors in the work environment?", ["Primary prevention strategy", "Secondary prevention strategy", "Tertiary prevention strategy", "None of the above"], 0, "");
+Q(10, "Stress inoculation consists of all of the following except:", ["Education", "Reflection", "Rehearsal", "Application"], 1, "");
+Q(10, "According to research, which of the following individuals would be least likely to engage in workplace violence?", ["A male who has a history of violence.", "An individual with high self-esteem who received negative feedback recently.", "A person who has a history of conflicts with co-workers.", "A female who recently received increased job responsibilities."], 3, "");
+Q(10, "Which approach to workplace violence suggests that frustration leads to a stress reaction and that the individual expends energy to relieve this stress?", ["Reactionary approach", "Justice hypothesis", "Frustration-aggression hypothesis", "Behavioral approach"], 2, "");
+Q(10, "All of the following characterize bullying except:", ["It occurs over a long time.", "It occurs repeatedly.", "A victim is subjected to social exclusion.", "Two equally strong parties are in conflict."], 3, "");
+Q(11, "Procedural justice is concerned with:", ["The possibility of influencing a process or outcome.", "The perceived fairness of the allocation of outcomes to members.", "The process by which rewards are distributed.", "The sensitivity with which employees are treated."], 2, "");
+Q(11, "Two separate facets of interactional justice are:", ["Interpersonal and informational justice", "Interpersonal and environmental justice", "Environmental and social justice", "Informational and comparative justice"], 0, "");
+Q(11, "Sarah has just had a performance review. She is frustrated with the unprofessional manner in which her manager conducted the review, even though the review was very positive and encouraging. Sarah is concerned about which type of justice?", ["Evaluative", "Distributive", "Procedural", "Interactional"], 2, "per official key; note: conceptually interactional/d");
+Q(11, "All of the following conditions would most likely lead to an experience of fairness during performance reviews except:", ["The supervisor was familiar with the duties and responsibilities of the subordinate.", "The supervisor relied on only those he/she most trusted to provide peer reviews.", "The supervisor provided suggestions on how to improve performance.", "The supervisor had an adequate opportunity to observe the subordinate at the workplace."], 1, "");
+Q(11, "Why might the use of student participants in conducting research on applicant perceptions of fairness be a concern?", ["There is a difference between pretending to be rejected and the reality of being rejected.", "Students tend to be unruly and may skew the results.", "Very few students have had the experience of a job to rely upon.", "Students are better able to handle issues of fairness than employees."], 0, "");
+Q(11, "Which of the following conclusions is false concerning research on applicant reactions?", ["Applicants express unfavorable opinions of work samples, citing them as stressful.", "Candidates are more favorable to interviews that appear to be related to the job under consideration.", "Applicants see recruiters as the personification of the organization doing the recruiting.", "Candidates are more favorable toward cognitive ability tests that have concrete items."], 0, "");
+Q(11, "Affirmative Action Programs (AAP):", ["help in assuring that employees are hired based only on merit.", "equalize the selection opportunities of all applicants.", "develop quotas to reduce underrepresentation.", "provide specific mechanisms for reducing underrepresentation."], 3, "");
+Q(11, "Which term is used to describe the method by which work groups and organizations are composed and changed?", ["Morphing composition", "Relational demography", "Diversification", "Composition transformation"], 1, "");
+Q(11, "All of the following are characteristics of organizations most likely to manage diversity successfully except:", ["They foster diversity only in formal levels of the organization.", "They take steps to reduce interpersonal conflict.", "They exhibit diversity at every level.", "They uncover and root out bias and discriminatory practices."], 0, "");
+Q(11, "The _____________ assumes there are no advantages for a diverse workforce since all employees share the same values and culture, while the _____________ often leads to justice and fairness debates.", ["assimilation model; value model", "value model; assimilation model", "protection model; assimilation model", "assimilation model; protection model"], 3, "");
+Q(12, "If a researcher is studying the characteristics of individuals who become leaders, he or she would particularly be interested in _____________.", ["leader treatment", "leadership effectiveness", "leader emergence", "leadership ability"], 2, "");
+Q(12, "All of the following are personality characteristics that are associated with individuals who emerge as leaders except:", ["Emotional stability", "Agreeableness", "Extraversion", "Openness to experience"], 1, "");
+Q(12, "All of the following are descriptive of the more modern approach to trait theory except:", ["It defines personality traits behaviorally.", "It considers traits in the context of organizational/situational variables.", "It has not had the success of traditional trait theory.", "It includes a general consensus on the meaning of personality traits."], 2, "");
+Q(12, "Most leadership training programs concentrate on developing, maintaining, or enhancing individual attributes. This is most accurately described as an example of:", ["behavior development", "personality development", "leadership development", "leader development"], 3, "");
+Q(12, "The researchers at Ohio State University pursued an approach that dealt with two dimensions: consideration and initiating structure. Which general leadership approach did they utilize?", ["Maturity approach", "Contingency approach", "New trait theory", "Behavioral approach"], 3, "");
+Q(12, "What is the general notion behind the contingency approach?", ["Any tactic should be backed up by an alternate course of action.", "The success of any given tactic depends upon multiple factors or situations.", "The ability of one factor to influence another factor is inherently ambiguous.", "Multiple factors must be considered in developing a course of action."], 1, "");
+Q(12, "_____________ leadership is best when the job is boring or the subordinate lacks self- confidence, whereas _____________ leadership is most effective when the job is not clearly defined.", ["Supportive; directive", "Directive; supportive", "Participative; directive", "Directive; participative"], 0, "");
+Q(12, "Which of the following is characteristically true of out-group members?", ["They are more likely to stay in an organization.", "They view exchanges with their leaders as simply contractual.", "They see themselves as involved in valuable knowledge exchange.", "Their leaders initiate discussions about personal matters with them."], 1, "");
+Q(12, "Which of the following is a criticism of the Multifactor Leadership Questionnaire?", ["It is based on only one theory, that of transactional leadership theory.", "It is unclear how many transactional and transformational strategies there are.", "It is overly long and often frustrates the test takers.", "It tends to be imprecise in measuring what it says it is measuring."], 1, "");
+Q(12, "According to a study described in the textbook, the mental health of female managers was _____________ if they adopted a(n) _____________ style in a male dominated industry.", ["worse; autocratic", "worse; interpersonal", "better; interpersonal", "better; nurturing"], 1, "");
+Q(13, "What does research indicate about the success of quality circles?", ["They are most successful in the short term.", "They are most successful in the long term.", "They are successful in both the short term and long term.", "They are generally not successful."], 0, "");
+Q(13, "All of the following are true of project teams except:", ["They are ongoing and have a long history that helps them develop cohesiveness.", "Team members come from different departments or functions.", "They are created to solve a particular problem or set of problems.", "They are dependent upon client preferences."], 0, "");
+Q(13, "A(n) _____________ has control over a variety of its functions including planning shift operations.", ["project team", "quality circle", "autonomous work group", "virtual team"], 2, "");
+Q(13, "_____________ include exchanging ideas without criticism, whereas _____________ include soliciting team members' feedback on the process the team is using to accomplish its goals.", ["Virtual-collaboration skills; virtual-communication skills", "Virtual-communication skills; virtual-collaboration skills", "Virtual-socialization skills; virtual-collaboration behaviors", "Virtual-collaboration behaviors; virtual-socialization skills"], 3, "");
+Q(13, "All of the following are team inputs except:", ["Team task", "Team composition", "Norms", "Organizational context"], 2, "");
+Q(13, "Shared mental models:", ["are a method for team members to employ similar thought processes.", "are organized ways for team members to think about how the team will work.", "allow for the study and measurement of individual thought processes.", "bring together like-minded individuals to create a more cohesive team."], 1, "");
+Q(13, "Team norms may develop through all of the following except:", ["Mandatory directives issued by the organization.", "Explicit statements by team members.", "The first behavior pattern that emerges in the team.", "Carry-over behaviors from past situations."], 0, "");
+Q(13, "The tendency called for groups to make decisions that are more extreme than those made by individuals is called:", ["Extremity phenomenon", "Extreme thinking", "Group polarization", "Group shift"], 2, "");
+Q(13, "The five stages of group development include the forming and norming stages. All of the following are also stages except:", ["Performing", "Storming", "Conforming", "Adjourning"], 2, "");
+Q(13, "All of the following are commonly-used team training strategies discussed in the text except:", ["Team leader training", "Cross-training", "Team coordination training", "Team process training"], 3, "");
+Q(14, "Max Weber, in his development of early organizational theory, described an organization according to all of the following dimensions except:", ["Span of control", "Satisfaction of workers", "Delegation of authority", "Division of labor"], 1, "");
+Q(14, "According to Argyris (1943), the natural experience for individuals is growth. He suggested that individuals develop in all of the following ways except:", ["From dependent to independent organisms.", "From unawareness to awareness of surroundings.", "From passive to active organisms.", "From organisms with few abilities to organisms with many abilities."], 1, "");
+Q(14, "An auto company produces cars according to a standard set of specifications. Workers and machines are located along an assembly-line operation. What type of organization best describes this type of company?", ["Specialty batch", "Small batch", "Continuous process", "Large batch/mass production"], 3, "");
+Q(14, "Compared to mechanistic organizations, organic organizations tend to have:", ["larger spans of control.", "smaller spans of control.", "about the same span of control.", "negligible spans of control."], 0, "");
+Q(14, "The ecological/evolutionary approach concentrates on explaining why:", ["some industries are inherently profitable while others are not.", "some employees succeed and others remain mediocre.", "some organizations thrive and others atrophy.", "some behavioral types are desirable for certain jobs."], 2, "");
+Q(14, "I-O psychologists have suggested that multiple climates exist within any organization and that these climates are defined:", ["less by structural components than by the goal of the group.", "less by the goal of the group than by structural components.", "equally by structural components and the goal of the group.", "with only minimal consideration to the goal of the group and structural components."], 0, "");
+Q(14, "_____________ is about the context in which action occurs, while _____________ is about the meaning that is intended by and inferred from those actions.", ["Treatment; perception", "Perception; treatment", "Climate; culture", "Culture; climate"], 2, "");
+Q(14, "Socialization refers to:", ["The creation of more opportunities by the organization for its employees to socialize with each other.", "The process by which new employees become aware of the values and procedures of an organization.", "The atmosphere of the organization in terms of the cohesiveness and camaraderie of its employees.", "The organization's social consciousness and its relationship with the community and environment."], 1, "");
+Q(14, "The three suggested stages of socialization include all of the following except:", ["Encounter stage", "Recruitment stage", "Metamorphosis stage", "Selection stage"], 3, "");
+Q(14, "According to the textbook, the appropriate model for continuous change is:", ["Unfreeze-Change-Refreeze", "Freeze-Rebalance-Unfreeze", "Freeze-Change-Refreeze", "Unfreeze-Rebalance-Refreeze"], 1, "");
+
+/* =====================================================================
+   PROGRESS STORAGE (localStorage with in-memory fallback)
+   progress = { "<questionId>": { a: attempts, c: correct } }
+   ===================================================================== */
+let memoryStore = null;
+function loadProgress() {
+  try { const raw = localStorage.getItem(STORAGE_KEY); if (raw) return JSON.parse(raw); }
+  catch (e) { /* storage unavailable */ }
+  return memoryStore ? JSON.parse(memoryStore) : {};
+}
+function saveProgress(p) {
+  const s = JSON.stringify(p);
+  memoryStore = s;
+  try { localStorage.setItem(STORAGE_KEY, s); } catch (e) { /* keep in-memory copy */ }
+}
+let progress = loadProgress();
+const isMastered = id => { const r = progress[id]; return !!r && r.a >= MASTERED_MIN_ATTEMPTS && r.c / r.a >= MASTERED_MIN_RATIO; };
+const isSeenCorrect = id => !!progress[id] && progress[id].c >= 1;
+const isSeen = id => !!progress[id] && progress[id].a >= 1;
+function record(id, correct) {
+  const r = progress[id] || (progress[id] = { a: 0, c: 0 });
+  r.a++; if (correct) r.c++;
+  saveProgress(progress);
+}
+
+/* =====================================================================
+   HELPERS
+   ===================================================================== */
+const $ = (sel, root = document) => root.querySelector(sel);
+const app = $("#app");
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+const chapters = [...new Set(QUESTIONS.map(q => q.chapter))].sort((a, b) => a - b);
+const MAX_CHAPTER = Math.max(14, ...chapters);
+const byChapter = ch => QUESTIONS.filter(q => q.chapter === ch);
+const pct = (x, y) => y ? Math.round(100 * x / y) : 0;
+
+/* =====================================================================
+   START SCREEN
+   ===================================================================== */
+const settings = { scope: "all", count: "10", filter: "all" };  // scope: "all" or chapter number
+
+function chapterStats(ch) {
+  const qs = byChapter(ch);
+  return {
+    total: qs.length,
+    seen: qs.filter(q => isSeen(q.id)).length,
+    correctOnce: qs.filter(q => isSeenCorrect(q.id)).length,
+    mastered: qs.filter(q => isMastered(q.id)).length
+  };
+}
+const isLearned = ch => { const s = chapterStats(ch); return s.total > 0 && s.mastered / s.total >= CHAPTER_LEARNED_RATIO; };
+
+function renderStart() {
+  stopConfetti();
+  const total = QUESTIONS.length;
+  const mastered = QUESTIONS.filter(q => isMastered(q.id)).length;
+  const correctOnce = QUESTIONS.filter(q => isSeenCorrect(q.id)).length;
+  const seen = QUESTIONS.filter(q => isSeen(q.id)).length;
+  const sub = [COURSE.code, COURSE.university].filter(Boolean).join(" – ");
+
+  const chips = [`<button class="chip wide" data-scope="all" aria-pressed="${settings.scope === "all"}">Full practice exam <small>all chapters · ${total} questions</small></button>`]
+    .concat(Array.from({ length: MAX_CHAPTER }, (_, i) => {
+      const ch = i + 1, n = byChapter(ch).length;
+      return `<button class="chip" data-scope="${ch}" ${n ? "" : "disabled"} aria-pressed="${settings.scope === ch}">Chapter ${ch}${isLearned(ch) ? ' <span class="tick">✔</span>' : ""}<small>${n} ${n === 1 ? "question" : "questions"}</small></button>`;
+    })).join("");
+
+  const rows = Array.from({ length: MAX_CHAPTER }, (_, i) => {
+    const ch = i + 1, s = chapterStats(ch);
+    return `<button class="chrow" data-scope="${ch}" ${s.total ? "" : "disabled"} title="Select chapter ${ch}">
+      <span class="lab">Chapter ${ch} ${isLearned(ch) ? '<span class="tick">✔</span>' : ""}</span>
+      <span class="bar" role="img" aria-label="${s.mastered} of ${s.total} mastered">
+        <span class="seen" style="width:${pct(s.correctOnce, s.total)}%"></span>
+        <span class="mastered" style="width:${pct(s.mastered, s.total)}%"></span></span>
+      <span class="num">${s.seen}/${s.total} seen</span></button>`;
+  }).join("");
+
+  app.innerHTML = `
+  <div class="top"><div><h1>${esc(COURSE.title)}</h1>
+    <p class="muted">${esc(COURSE.book)}${sub ? " · " + esc(sub) : ""}</p></div></div>
+  <div class="stack">
+    <section class="card">
+      <h2 class="section-title">What do you want to practise?</h2>
+      <div class="chips" id="chips">${chips}</div>
+      <div class="row" style="margin-top:18px">
+        <div class="opt-group"><span class="lbl" style="display:block;font-weight:600;margin-bottom:6px">Questions per session</span>
+          <div class="seg" id="segCount">
+            ${["10", "20", "all"].map(v => `<button data-v="${v}" aria-pressed="${settings.count === v}">${v === "all" ? "All" : v}</button>`).join("")}
+          </div></div>
+        <div class="opt-group"><span class="lbl" style="display:block;font-weight:600;margin-bottom:6px">Which questions</span>
+          <div class="seg" id="segFilter">
+            <button data-v="all" aria-pressed="${settings.filter === "all"}">All questions</button>
+            <button data-v="new" aria-pressed="${settings.filter === "new"}">Only new and not yet mastered</button>
+          </div></div>
+      </div>
+      <p id="startMsg" class="muted" role="status" style="min-height:1.5em;margin:12px 0 0"></p>
+      <button class="btn primary" id="startBtn">Start practising</button>
+    </section>
+
+    <section class="card">
+      <h2 class="section-title">Your progress</h2>
+      <div class="overall"><strong>${pct(mastered, total)}% mastered</strong>
+        <span class="muted">${mastered} mastered · ${seen}/${total} seen</span></div>
+      <div class="bar" style="margin-top:8px"><span class="seen" style="width:${pct(correctOnce, total)}%"></span><span class="mastered" style="width:${pct(mastered, total)}%"></span></div>
+      <div class="legend"><span><i style="background:var(--accent-soft)"></i>answered correctly at least once</span><span><i style="background:var(--accent)"></i>mastered (at least ${MASTERED_MIN_ATTEMPTS} attempts, ≥ ${MASTERED_MIN_RATIO * 100}% correct)</span><span><span class="tick">✔</span> chapter learned (≥ ${CHAPTER_LEARNED_RATIO * 100}% mastered)</span></div>
+      <div>${rows}</div>
+      <div class="tools">
+        <button class="btn" id="exportBtn">Export progress</button>
+        <button class="btn" id="importBtn">Import progress</button>
+        <button class="btn danger" id="resetBtn">Reset progress</button>
+        <input type="file" id="importFile" accept="application/json" class="hidden">
+      </div>
+    </section>
+  </div>`;
+
+  $("#chips").onclick = e => { const b = e.target.closest("[data-scope]"); if (b && !b.disabled) selectScope(b.dataset.scope); };
+  app.querySelectorAll(".chrow").forEach(r => r.onclick = () => { if (!r.disabled) { selectScope(r.dataset.scope); window.scrollTo({ top: 0, behavior: "smooth" }); } });
+  $("#segCount").onclick = e => { const b = e.target.closest("[data-v]"); if (b) { settings.count = b.dataset.v; syncSeg("#segCount", settings.count); } };
+  $("#segFilter").onclick = e => { const b = e.target.closest("[data-v]"); if (b) { settings.filter = b.dataset.v; syncSeg("#segFilter", settings.filter); } };
+  $("#startBtn").onclick = startFromSettings;
+  $("#resetBtn").onclick = () => { if (confirm("Are you sure you want to reset all progress? This cannot be undone.")) { progress = {}; saveProgress(progress); renderStart(); } };
+  $("#exportBtn").onclick = exportProgress;
+  $("#importBtn").onclick = () => $("#importFile").click();
+  $("#importFile").onchange = importProgress;
+}
+function selectScope(v) {
+  settings.scope = v === "all" ? "all" : Number(v);
+  app.querySelectorAll("#chips .chip").forEach(c => c.setAttribute("aria-pressed", String(c.dataset.scope === String(settings.scope))));
+}
+function syncSeg(sel, v) { app.querySelectorAll(sel + " button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.v === v))); }
+
+function startFromSettings() {
+  let pool = settings.scope === "all" ? QUESTIONS : byChapter(settings.scope);
+  if (settings.filter === "new") pool = pool.filter(q => !isMastered(q.id));
+  const msg = $("#startMsg");
+  if (!pool.length) { msg.textContent = settings.filter === "new" ? "Everything in this selection is already mastered. Choose “All questions” to practise anyway." : "No questions available for this selection."; return; }
+  pool = shuffle(pool);
+  if (settings.count !== "all") pool = pool.slice(0, Number(settings.count));
+  startSession(pool);
+}
+
+function exportProgress() {
+  const blob = new Blob([JSON.stringify({ version: 1, progress }, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob); a.download = "practice-progress.json";
+  document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+}
+function importProgress(e) {
+  const f = e.target.files[0]; if (!f) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      const p = data.progress || data;
+      if (typeof p !== "object" || Array.isArray(p)) throw new Error("bad");
+      const clean = {};
+      for (const [k, v] of Object.entries(p)) if (v && Number.isFinite(v.a) && Number.isFinite(v.c)) clean[k] = { a: v.a, c: v.c };
+      progress = clean; saveProgress(progress); renderStart();
+    } catch (err) { alert("This file could not be read as a progress file."); }
+  };
+  reader.readAsText(f);
+}
+
+/* =====================================================================
+   QUIZ SESSION
+   ===================================================================== */
+let session = null;   // { questions, index, answered, correct, wrong, results:[{q, chosen, ok}] }
+
+function startSession(questions) {
+  session = { questions, index: 0, answered: false, correct: 0, wrong: 0, results: [] };
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const s = session, q = s.questions[s.index], total = s.questions.length;
+  s.answered = false;
+  app.innerHTML = `
+  <div class="card">
+    <div class="qhead"><strong>Question ${s.index + 1} of ${total}</strong>
+      <span class="score" aria-live="polite"><b class="g">${s.correct}</b> correct · <b class="r">${s.wrong}</b> wrong</span></div>
+    <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="${total}" aria-valuenow="${s.index}"><span class="mastered" style="width:${pct(s.index, total)}%"></span></div>
+    <div class="qmeta" style="margin-top:12px">Chapter ${q.chapter}</div>
+    <h2 class="qtext">${esc(q.question)}</h2>
+    <div class="options" id="options">
+      ${q.options.map((o, i) => `<button class="option" data-i="${i}"><span class="ltr">${o.letter}</span><span>${esc(o.text)}</span></button>`).join("")}
+    </div>
+    <div id="feedback" aria-live="polite"></div>
+    <div class="actions">
+      <button class="btn" id="stopBtn">Stop</button>
+      <button class="btn primary hidden" id="nextBtn">${s.index + 1 === total ? "See results" : "Next question"}</button>
+    </div>
+    <p class="kbd">Keyboard shortcuts: <b>a</b>–<b>d</b> pick an answer · <b>Enter</b> or <b>→</b> goes to the next question.</p>
+  </div>`;
+  $("#options").onclick = e => { const b = e.target.closest(".option"); if (b) answer(Number(b.dataset.i)); };
+  $("#nextBtn").onclick = next;
+  $("#stopBtn").onclick = finish;
+}
+
+function answer(i) {
+  const s = session; if (!s || s.answered) return;
+  const q = s.questions[s.index];
+  if (!q.options[i]) return;
+  s.answered = true;
+  const correctIdx = q.options.findIndex(o => o.letter === q.correctAnswer);
+  const ok = i === correctIdx;
+  ok ? s.correct++ : s.wrong++;
+  s.results.push({ q, chosen: i, ok });
+  record(q.id, ok);
+
+  const btns = app.querySelectorAll(".option");
+  btns.forEach((b, idx) => {
+    b.disabled = true;
+    if (idx === correctIdx) b.classList.add("correct");
+    else if (idx === i) b.classList.add("wrong");
+  });
+  const c = q.options[correctIdx];
+  $("#feedback").innerHTML = `<div class="feedback ${ok ? "" : "bad"}">
+    <strong>${ok ? "Correct!" : "Wrong."}</strong>
+    ${ok ? "" : `<p>The correct answer is <b>${c.letter}.</b> ${esc(c.text)}</p>`}
+    ${q.rationale ? `<p>${esc(q.rationale)}</p>` : ""}</div>`;
+  $(".score").innerHTML = `<b class="g">${s.correct}</b> correct · <b class="r">${s.wrong}</b> wrong`;
+  const nb = $("#nextBtn"); nb.classList.remove("hidden"); nb.focus({ preventScroll: true });
+  if (ok) launchConfetti();
+}
+
+function next() {
+  const s = session; if (!s || !s.answered) return;
+  if (s.index + 1 >= s.questions.length) finish(); else { s.index++; renderQuestion(); window.scrollTo({ top: 0 }); }
+}
+
+document.addEventListener("keydown", e => {
+  if (!session || !$("#options") || e.ctrlKey || e.metaKey || e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (!session.answered && ["a", "b", "c", "d"].includes(k)) { answer(k.charCodeAt(0) - 97); e.preventDefault(); }
+  else if (session.answered && (e.key === "Enter" || e.key === "ArrowRight")) { next(); e.preventDefault(); }
+});
+
+/* =====================================================================
+   RESULTS
+   ===================================================================== */
+function finish() {
+  const s = session; if (!s) return;
+  stopConfetti();
+  const answered = s.results.length;
+  if (!answered) { session = null; renderStart(); return; }
+  const wrong = s.results.filter(r => !r.ok);
+  const p = pct(s.correct, answered);
+  const skipped = s.questions.length - answered;
+  app.innerHTML = `
+  <div class="stack">
+    <section class="card">
+      <h1 style="font-size:1.4rem">Results</h1>
+      <div class="big">${s.correct} / ${answered} <span class="muted" style="font-size:1.2rem">(${p}%)</span></div>
+      <p class="muted">${p >= 90 ? "Excellent work." : p >= 70 ? "Good job, a few points left to review." : "Review the wrong questions and try again."}${skipped ? ` You stopped with ${skipped} unanswered ${skipped === 1 ? "question" : "questions"}.` : ""}</p>
+      <div class="tools">
+        ${wrong.length ? `<button class="btn primary" id="retryBtn">Retry only the wrong questions (${wrong.length})</button>` : ""}
+        <button class="btn" id="homeBtn">Back to start</button>
+      </div>
+    </section>
+    ${wrong.length ? `<section class="card"><h2 class="section-title">Questions you got wrong</h2>
+      ${wrong.map(r => { const c = r.q.options.find(o => o.letter === r.q.correctAnswer);
+        return `<div class="wrong-item"><div class="qmeta">Chapter ${r.q.chapter}</div><div>${esc(r.q.question)}</div>
+        <div class="you">Your answer: ${r.q.options[r.chosen].letter}. ${esc(r.q.options[r.chosen].text)}</div>
+        <div class="ans">Correct: ${c.letter}. ${esc(c.text)}</div>${r.q.rationale ? `<div class="muted">${esc(r.q.rationale)}</div>` : ""}</div>`; }).join("")}
+    </section>` : ""}
+  </div>`;
+  const retry = $("#retryBtn");
+  if (retry) retry.onclick = () => startSession(shuffle(wrong.map(r => r.q)));
+  $("#homeBtn").onclick = () => { session = null; renderStart(); };
+  window.scrollTo({ top: 0 });
+}
+
+/* =====================================================================
+   CONFETTI (canvas, no libraries)
+   ===================================================================== */
+const canvas = $("#confetti"), ctx = canvas.getContext("2d");
+let particles = [], raf = null;
+const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function sizeCanvas() { const r = window.devicePixelRatio || 1; canvas.width = innerWidth * r; canvas.height = innerHeight * r; ctx.setTransform(r, 0, 0, r, 0, 0); }
+addEventListener("resize", sizeCanvas); sizeCanvas();
+function launchConfetti() {
+  if (reduceMotion) return;
+  const colors = ["#0f8a63", "#34c58f", "#1b2f55", "#6c93e0", "#f2c14e", "#e86a6a"];
+  for (let i = 0; i < 90; i++) particles.push({
+    x: innerWidth / 2 + (Math.random() - .5) * 120, y: innerHeight * .55,
+    vx: (Math.random() - .5) * 11, vy: -Math.random() * 13 - 4,
+    w: 6 + Math.random() * 6, h: 4 + Math.random() * 5, rot: Math.random() * 6.28, vr: (Math.random() - .5) * .4,
+    color: colors[i % colors.length], life: 0
+  });
+  if (!raf) raf = requestAnimationFrame(tick);
+}
+function tick() {
+  ctx.clearRect(0, 0, innerWidth, innerHeight);
+  particles = particles.filter(p => p.y < innerHeight + 20 && p.life < 140);
+  for (const p of particles) {
+    p.vy += .35; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.rot += p.vr; p.life++;
+    ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot);
+    ctx.globalAlpha = Math.max(0, 1 - p.life / 140); ctx.fillStyle = p.color;
+    ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); ctx.restore();
+  }
+  raf = particles.length ? requestAnimationFrame(tick) : null;
+  if (!raf) ctx.clearRect(0, 0, innerWidth, innerHeight);
+}
+function stopConfetti() { particles = []; if (raf) cancelAnimationFrame(raf); raf = null; ctx.clearRect(0, 0, innerWidth, innerHeight); }
+
+renderStart();
+</script>
+</body>
+</html>
