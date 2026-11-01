@@ -1,46 +1,226 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>1ZV60 Practice Module</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-:root{--navy:#14213d;--slate:#475569;--bg:#f1f5f9;--card:#fff;--line:#cbd5e1;--ok:#059669;--okbg:#d1fae5;--bad:#dc2626;--badbg:#fee2e2;--acc:#1e3a8a}
-@media (prefers-color-scheme:dark){:root{--navy:#e2e8f0;--slate:#94a3b8;--bg:#0f172a;--card:#1e293b;--line:#334155;--okbg:#064e3b;--badbg:#7f1d1d;--acc:#60a5fa}}
+/* ===== TU/e Crime Scene Investigation Board – 1ZV60 =====
+   The original variable names used by the script (--ok etc.) are kept. */
+:root{
+  --cork:#8c6239; --frame:#3d2610; --ink:#1c1c1c;
+  --paper:#fdfbf7; --folder:#e6ccb2; --report:#f4eee1; --postit:#fff68f;
+  --stamp:#a31621; --stamp-bg:#ffebee; --ok:#1b5e20; --ok-bg:#e8f5e9;
+  --muted:#5a4a35; --line:#cdbf9f; --focus:#1a4fd6;
+  --navy:var(--ink); --slate:var(--muted); --bg:var(--cork); --card:var(--paper);
+  --okbg:var(--ok-bg); --bad:var(--stamp); --badbg:var(--stamp-bg); --acc:var(--stamp);
+  --tan:#d9b98a;
+}
 *{box-sizing:border-box}
-body{margin:0;font-family:Inter,system-ui,sans-serif;background:var(--bg);color:var(--navy);line-height:1.5}
-.wrap{max-width:760px;margin:0 auto;padding:20px 16px}
-h1{font-size:1.5rem;margin:.2em 0}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:20px;margin-bottom:16px}
-label{display:block;font-weight:600;margin:14px 0 6px}
-select{width:100%;padding:10px;border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--navy);font:inherit}
-button{font:inherit;font-weight:600;border:0;border-radius:8px;padding:11px 18px;cursor:pointer;background:var(--acc);color:#fff}
-button.sec{background:transparent;color:var(--acc);border:1px solid var(--acc)}
-button:disabled{opacity:.4;cursor:not-allowed}
-.row{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
-.bar{height:8px;background:var(--line);border-radius:4px;overflow:hidden;margin:8px 0}
-.bar i{display:block;height:100%;background:var(--ok);transition:width .3s}
-.meta{display:flex;justify-content:space-between;font-size:.9rem;color:var(--slate);flex-wrap:wrap;gap:6px}
-.opt{display:flex;gap:10px;width:100%;text-align:left;margin:8px 0;padding:12px;background:var(--card);color:var(--navy);border:1px solid var(--line)}
-.opt:hover:not(:disabled){border-color:var(--acc)}
-.opt.sel{border-color:var(--acc);box-shadow:0 0 0 2px var(--acc) inset}
-.opt.ok{background:var(--okbg);border-color:var(--ok)}
-.opt.bad{background:var(--badbg);border-color:var(--bad)}
-.opt:disabled{opacity:1;cursor:default}
-.opt b{min-width:1.4em}
-.why{border-left:4px solid var(--ok);background:var(--okbg);padding:12px;border-radius:6px;margin-top:12px}
-.big{font-size:2.6rem;font-weight:700;color:var(--ok)}
-.wrong{border-top:1px solid var(--line);padding:10px 0;font-size:.95rem}
+html{-webkit-text-size-adjust:100%;background:var(--frame)}
+
+/* Corkboard + wooden frame + vignette */
+body{
+  margin:0; min-height:100vh;
+  font:16px/1.55 "Courier New", Courier, monospace; color:var(--ink);
+  background-color:#8c6239;
+  background-image:
+    radial-gradient(circle at 20% 30%, rgba(61,38,16,.38) 0 1.5px, transparent 2.2px),
+    radial-gradient(circle at 72% 62%, rgba(255,222,172,.22) 0 1.6px, transparent 2.6px),
+    radial-gradient(circle at 42% 82%, rgba(40,22,8,.32) 0 1px, transparent 2px),
+    radial-gradient(circle at 85% 15%, rgba(30,16,6,.28) 0 2.2px, transparent 3px),
+    radial-gradient(circle at 50% 50%, rgba(176,126,72,.55) 0, rgba(140,98,57,0) 70%),
+    radial-gradient(circle at 30% 70%, rgba(92,58,26,.35) 0, rgba(140,98,57,0) 60%);
+  background-size:23px 23px, 31px 31px, 17px 17px, 57px 57px, 130px 130px, 190px 190px;
+  border:16px solid #3d2610;
+  box-shadow:inset 0 0 50px rgba(0,0,0,0.75);
+}
+.wrap{max-width:780px;margin:0 auto;padding:118px 16px 72px}
+h1,h2,h3{
+  font-family:inherit; font-weight:700; line-height:1.25; margin:0;
+  text-transform:uppercase; letter-spacing:.06em;
+  border-bottom:2px solid #1c1c1c; padding-bottom:6px;
+}
+h2,h3{margin-bottom:16px}
 .hidden{display:none}
-.crow{display:grid;grid-template-columns:3em 1fr 4em 6.5em;gap:8px;align-items:center;padding:4px 0;cursor:pointer;font-size:.9rem}
-.crow:hover{background:var(--bg)}.crow .bar{margin:0}.bar{position:relative}.bar i{position:absolute;left:0;top:0}.bar i.lt{background:var(--acc);opacity:.4}.cp{font-weight:600}.cs{color:var(--slate);font-size:.8rem}
+:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
+
+/* ===== Page furniture: post-it (top left) and caution tape (top right); both scroll away with the page ===== */
+.postit-link{
+  position:absolute; top:30px; left:32px; z-index:40;
+  display:block; width:158px; padding:12px 14px 14px;
+  background:linear-gradient(160deg,#fff68f 0%,#fff68f 86%,#ece05a 100%);
+  color:#1c1c1c; text-decoration:none; font-weight:700; font-size:.78rem; line-height:1.3;
+  letter-spacing:.05em; text-transform:uppercase;
+  transform:rotate(-3deg);
+  box-shadow:3px 6px 10px rgba(0,0,0,.5);
+  transition:transform .15s ease, box-shadow .15s ease;
+}
+.postit-link:hover{transform:rotate(-1deg) translateY(-2px);box-shadow:4px 9px 14px rgba(0,0,0,.5)}
+.caution-tape{
+  position:absolute; top:40px; right:30px; z-index:40; pointer-events:none;
+  display:flex; align-items:stretch;
+  background:#f7c600; color:#1c1c1c; transform:rotate(3.5deg);
+  box-shadow:2px 6px 10px rgba(0,0,0,.5);
+  padding:20px 14px; font-weight:800; font-size:.74rem; letter-spacing:.12em; white-space:nowrap;
+}
+.caution-tape::before,.caution-tape::after{
+  content:""; position:absolute; left:0; right:0; height:7px;
+  background:repeating-linear-gradient(-45deg,#1c1c1c 0 9px,#f7c600 9px 18px);
+}
+.caution-tape::before{top:0}
+.caution-tape::after{bottom:0}
+.caution-tape .tue{background:#1c1c1c;color:#f7c600;padding:0 7px;margin-right:10px;display:inline-flex;align-items:center}
+
+/* ===== Header label ===== */
+.top{
+  position:relative; margin-bottom:52px; padding:20px 24px 16px;
+  background:var(--paper); border:1px solid var(--line);
+  transform:rotate(-.5deg);
+  box-shadow:3px 5px 10px rgba(0,0,0,.45);
+}
+.top::before{ /* strip of masking tape */
+  content:""; position:absolute; top:-13px; left:50%; width:104px; height:24px; margin-left:-52px;
+  background:rgba(255,246,143,.72); transform:rotate(-2.5deg);
+  box-shadow:0 1px 2px rgba(0,0,0,.2);
+}
+.top h1{font-size:clamp(1.05rem,4.4vw,1.5rem)}
+.top .meta{margin-top:8px}
+
+/* ===== Dossier sheets ===== */
+.card{
+  position:relative;
+  background:var(--paper);
+  border:1px solid var(--line); border-top:18px solid var(--folder);
+  border-radius:2px; padding:30px 26px 26px; margin-bottom:50px;
+  box-shadow:5px 6px 0 -1px #f0e7d0, 6px 8px 3px -1px rgba(0,0,0,.28), 0 18px 32px rgba(0,0,0,.5);
+}
+.card::before{ /* red thumbtack */
+  content:""; position:absolute; top:-32px; left:50%; width:24px; height:24px; margin-left:-12px; z-index:3;
+  border-radius:50%;
+  background:radial-gradient(circle at 35% 30%,#ff8a8a 0,#d6303d 28%,#a31621 55%,#6e0d15 100%);
+  box-shadow:inset -2px -3px 4px rgba(0,0,0,.4), 2px 7px 5px -1px rgba(0,0,0,.5);
+}
+.card::after{ /* folder tab */
+  content:""; position:absolute; top:-34px; right:42px; width:124px; height:16px;
+  background:var(--folder); border-radius:7px 7px 0 0;
+}
+
+/* ===== Form fields ===== */
+label{display:block;margin:16px 0 6px;font-weight:700;font-size:.8rem;text-transform:uppercase;letter-spacing:.08em}
+label:first-child{margin-top:0}
+select{
+  width:100%; padding:10px; font:inherit; color:var(--ink);
+  background:var(--report); border:2px solid var(--ink); border-radius:0;
+  box-shadow:1px 2px 3px rgba(0,0,0,.2);
+}
+select:hover{background:var(--postit)}
+
+/* ===== Buttons: red rubber ink stamps ===== */
+button:not(.opt){
+  font:inherit; font-weight:800; text-transform:uppercase; letter-spacing:.09em; font-size:.88rem;
+  color:var(--stamp); background:rgba(163,22,33,.07);
+  border:3px double var(--stamp); border-radius:3px; padding:11px 20px; cursor:pointer;
+  transition:transform .12s ease, background-color .12s ease;
+}
+button:not(.opt):hover:not(:disabled){background:rgba(163,22,33,.16);transform:rotate(-2deg) scale(1.03)}
+button:not(.opt):active:not(:disabled){transform:rotate(1deg) scale(.97)}
+button.sec{background:transparent;padding:9px 16px;font-size:.82rem}
+button.sec:hover:not(:disabled){background:rgba(163,22,33,.09)}
+button#resetBtn{color:#6e0d15;border-color:#6e0d15}
+button:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;gap:12px;flex-wrap:wrap;margin-top:20px}
+
+/* ===== Progress bars ===== */
+.bar{position:relative;height:14px;margin:10px 0;border:2px solid var(--ink);border-radius:0;background:#efe6d0;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok);transition:width .3s}
+.bar i{position:absolute;left:0;top:0}
+.bar i.lt{background:var(--tan);opacity:1}
+.meta{display:flex;justify-content:space-between;font-size:.88rem;color:var(--muted);flex-wrap:wrap;gap:6px}
+#dash .meta{display:block;line-height:1.5}
+#dashTop{margin-bottom:4px}
+.crow{
+  display:grid;grid-template-columns:3em 1fr 4em 7em;gap:10px;align-items:center;
+  padding:6px 8px;cursor:pointer;font-size:.9rem;border-bottom:1px dashed var(--line)
+}
+.crow:hover{background:var(--postit)}
+.crow .bar{margin:0}
+.cp{font-weight:700}
+.cs{color:var(--muted);font-size:.8rem}
+
+/* ===== Answer options: typed evidence entries ===== */
+.opt{
+  position:relative; display:flex; gap:12px; align-items:flex-start; width:100%; text-align:left;
+  margin:12px 0; padding:12px 14px; font:inherit; font-weight:400; color:var(--ink);
+  background:var(--report); border:0; border-left:6px solid var(--cork); border-radius:0; cursor:pointer;
+  box-shadow:1px 2px 3px rgba(0,0,0,.2);
+  transition:transform .12s ease, background-color .12s ease, box-shadow .12s ease;
+}
+.opt:hover:not(:disabled),.opt.sel{background:var(--postit);transform:rotate(-.4deg) translateY(-1px);box-shadow:3px 5px 8px rgba(0,0,0,.3)}
+.opt b{
+  flex:none; min-width:30px; height:28px; display:grid; place-items:center;
+  border:2px solid var(--ink); font-weight:800; text-transform:uppercase
+}
+.opt:disabled{opacity:1;cursor:default}
+.opt.ok{background:var(--ok-bg);border:3px double var(--ok);color:var(--ok);font-weight:700}
+.opt.ok b{background:var(--ok);border-color:var(--ok);color:#fff}
+.opt.bad{background:var(--stamp-bg);border:3px double var(--stamp);color:var(--stamp);font-weight:700}
+.opt.bad b{background:var(--stamp);border-color:var(--stamp);color:#fff}
+.opt.ok::after,.opt.bad::after{
+  position:absolute; top:-13px; right:14px; padding:1px 8px;
+  font-size:.7rem; font-weight:800; letter-spacing:.14em; background:var(--paper);
+  border:2px solid currentColor; transform:rotate(3deg);
+}
+.opt.ok::after{content:"VERIFIED"}
+.opt.bad::after{content:"REJECTED"}
+
+/* ===== Feedback stamps =====
+   The script writes plain text into #why and adds no state class, so the state is read
+   from the answer buttons: a rejected option (.opt.bad) exists only after a wrong answer. */
+.why{
+  margin-top:24px; padding:12px 16px 14px;
+  border:3px double var(--ok); background:var(--ok-bg); color:var(--ok);
+  transform:rotate(-.6deg); transform-origin:left center;
+  animation:stampIn .28s cubic-bezier(.2,.9,.3,1.2) both;
+}
+.why::before{content:"VERIFIED / CLEARED";display:block;margin-bottom:6px;font-size:1.15rem;font-weight:800;letter-spacing:.14em}
+#quiz:has(.opt.bad) .why{border-color:var(--stamp);background:var(--stamp-bg);color:var(--stamp);transform:rotate(.7deg)}
+#quiz:has(.opt.bad) .why::before{content:"REJECTED / DISCREPANCY"}
+@keyframes stampIn{from{opacity:0;transform:rotate(-4deg) scale(1.3)}}
+#qText{text-transform:none;letter-spacing:0;padding-bottom:10px;margin:8px 0 18px}
+#chLabel{text-transform:uppercase;letter-spacing:.1em;font-size:.8rem;margin-top:10px}
+
+/* ===== Results ===== */
+.big{font-size:2.6rem;font-weight:700;color:var(--ink);margin:10px 0 4px}
+.wrong{border-top:1px dashed var(--line);padding:12px 0;font-size:.95rem}
+
+@media (max-width:640px){
+  body{border-width:10px}
+  .wrap{padding:104px 12px 56px}
+  .card{padding:26px 16px 20px}
+  .postit-link{top:22px;left:20px;width:122px;padding:9px 10px 11px;font-size:.62rem}
+  .caution-tape{top:30px;right:16px;font-size:.58rem;padding:15px 9px;letter-spacing:.08em}
+  .caution-tape .tue{margin-right:6px;padding:0 4px}
+  .crow{grid-template-columns:2.6em 1fr 3.4em 5.6em;gap:6px}
+}
+@media (max-width:370px){
+  .caution-tape .tue{display:none}
+  .caution-tape{font-size:.54rem}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  button:not(.opt):hover:not(:disabled),.opt:hover:not(:disabled){transform:none}
+}
 </style>
 </head>
 <body>
+<a class="postit-link" href="https://wpleenheer-ship-it.github.io/TU-e/">← RETURN TO EVIDENCE BOARD</a>
+<div class="caution-tape" role="note"><span class="tue">TU/e</span><span>DO NOT CROSS // EXAM AREA</span></div>
 <div class="wrap">
-  <h1>1ZV60 · Methodology for IE Research</h1>
-  <div class="meta" style="margin-bottom:14px">Practice module based on Bell, Bryman &amp; Harley – Business Research Methods</div>
+  <header class="top">
+    <h1>1ZV60 · Methodology for IE Research</h1>
+    <div class="meta">Practice module based on Bell, Bryman &amp; Harley – Business Research Methods</div>
+  </header>
 
   <!-- STARTSCHERM -->
   <section id="setup" class="card">
@@ -66,7 +246,7 @@ button:disabled{opacity:.4;cursor:not-allowed}
       <button class="sec" id="resetBtn">Reset</button>
       <input type="file" id="impFile" accept=".json" class="hidden">
     </div>
-    <div class="meta" style="margin-top:10px">Light bar = answered correctly at least once; solid bar = mastered. A question is mastered after at least 2 attempts with ≥90% correct. A chapter is learned (✔) when ≥90% of its questions are mastered. Click a chapter to select it. Progress is saved in this browser.</div>
+    <div class="meta" style="margin-top:10px">Light bar = answered correctly at least once; solid bar = mastered. A question is mastered after at least 2 attempts with ≥90% correct. A chapter is learnt (✔) when ≥90% of its questions are mastered. Click a chapter to select it. Progress is saved in this browser.</div>
   </section>
 
   <!-- QUIZ -->
@@ -495,7 +675,7 @@ function renderDash(){
     h += `<div class="crow" data-c="${c}"><b>H${c}</b><div class="bar" title="${p1}% answered correctly at least once · ${p}% mastered"><i class="lt" style="width:${p1}%"></i><i style="width:${p}%"></i></div><span class="cp">${p}%${done ? " ✔" : ""}</span><span class="cs">${seen}/${qs.length} seen</span></div>`;
   }
   const P = tot ? Math.round(mas / tot * 100) : 0, P1 = tot ? Math.round(ok1 / tot * 100) : 0;
-  $("dashTop").innerHTML = `<b>${P}% mastered</b> (${mas} of ${tot} questions) · ${P1}% answered correctly at least once · ${learned} chapters learned`;
+  $("dashTop").innerHTML = `<b>${P}% mastered</b> (${mas} of ${tot} questions) · ${P1}% answered correctly at least once · ${learned} chapters learnt`;
   $("dashBar").style.width = P + "%"; $("dashBar0").style.width = P1 + "%"; $("dashRows").innerHTML = h;
   $("dashRows").querySelectorAll(".crow").forEach(r => r.onclick = () => { $("chSel").value = r.dataset.c; scrollTo(0,0); });
 }
@@ -568,7 +748,7 @@ document.body.appendChild(cv);
 const cx = cv.getContext("2d");
 function confetti(){
   cv.width = innerWidth; cv.height = innerHeight;
-  const cols = ["#059669","#1e3a8a","#f59e0b","#ec4899","#38bdf8"];
+  const cols = ["#a31621","#1b5e20","#fff68f","#e6ccb2","#1c1c1c","#f7c600"];
   const ps = Array.from({length:90}, () => ({x:innerWidth/2, y:innerHeight*0.45, vx:(Math.random()-.5)*14, vy:-Math.random()*13-3, s:5+Math.random()*6, r:Math.random()*6, c:cols[Math.random()*cols.length|0]}));
   let f = 0;
   (function tick(){
