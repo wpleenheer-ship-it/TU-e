@@ -6,7 +6,7 @@ Source: https://www.studeersnel.nl/nl/document/technische-universiteit-eindhoven
 
 
 
-Goodluck with training for the final test
+Goodluck with training for the final test -> https://wpleenheer-ship-it.github.io/TU-e/
 
 Didn't like the paywall, The real crime is gatekeeping knowledge ;)
 
