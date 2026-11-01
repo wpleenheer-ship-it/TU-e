@@ -1,43 +1,293 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="refresh" content="0; url=1ZV60_oefenmodule.html">
-    <title>1ZV60 Oefenmodule</title>
+    <title>TU/e Case Files — Practice Modules</title>
     <style>
+        :root {
+            --cork-bg: #8c6239;
+            --cork-dark: #5e3f22;
+            --paper-bg: #f4eee1;
+            --folder-bg: #e6ccb2;
+            --red-string: #b81d13;
+            --tape-color: rgba(235, 225, 195, 0.65);
+            --ink-color: #1c1c1c;
+            --stamp-red: #a31621;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: "Courier New", Courier, monospace;
+            margin: 0;
+            min-height: 100vh;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            color: var(--ink-color);
+            background-color: var(--cork-bg);
+            background-image: 
+                radial-gradient(rgba(0, 0, 0, 0.18) 15%, transparent 16%),
+                radial-gradient(rgba(255, 255, 255, 0.08) 15%, transparent 16%),
+                radial-gradient(circle at center, transparent 0%, rgba(0, 0, 0, 0.55) 100%);
+            background-size: 16px 16px, 16px 16px, 100% 100%;
+            background-position: 0 0, 8px 8px, 0 0;
+            border: 18px solid #3d2610;
+            box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.7);
+            padding: 2rem;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        /* Caution tape across the top corner */
+        .caution-tape {
+            position: fixed;
+            top: 25px;
+            right: -65px;
+            background: #eab308;
+            color: #000;
+            font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            font-size: 1rem;
+            letter-spacing: 3px;
+            padding: 6px 70px;
+            transform: rotate(35deg);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            border-top: 2px dashed #000;
+            border-bottom: 2px dashed #000;
+            z-index: 20;
+            user-select: none;
+        }
+
+        /* Main pinned header note */
+        .header-note {
+            background: var(--paper-bg);
+            padding: 1.5rem 3rem;
+            box-shadow: 4px 8px 18px rgba(0, 0, 0, 0.45);
+            transform: rotate(-1.5deg);
+            position: relative;
+            margin-bottom: 3.5rem;
+            border: 1px solid #d4cbb8;
+            text-align: center;
+            z-index: 5;
+            max-width: 600px;
+        }
+
+        .header-note h1 {
             margin: 0;
-            background-color: #f4f6f8;
+            font-size: 1.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            border-bottom: 2px solid var(--ink-color);
+            padding-bottom: 0.4rem;
+        }
+
+        .header-note p {
+            margin: 0.6rem 0 0;
+            font-size: 0.95rem;
+            color: #444;
+            font-weight: bold;
+        }
+
+        /* Thumbtack pin */
+        .pin {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: radial-gradient(circle at 30% 30%, #ff5252, #8b0000);
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 2px 4px 6px rgba(0, 0, 0, 0.5), inset -2px -2px 4px rgba(0, 0, 0, 0.4);
+            z-index: 10;
+        }
+
+        .pin::after {
+            content: '';
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+        }
+
+        /* Board area containing the files and connecting string */
+        .board-grid {
+            display: flex;
+            gap: 4rem;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: stretch;
+            position: relative;
+            max-width: 950px;
+            width: 100%;
+            z-index: 5;
+        }
+
+        /* Red yarn connecting the pins */
+        .string-connector {
+            position: absolute;
+            top: 20px;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background-color: var(--red-string);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            z-index: 4;
+            transform: rotate(1deg);
+            pointer-events: none;
+        }
+
+        /* Dossier / Evidence Card */
+        .case-file {
+            background: var(--folder-bg);
+            width: 340px;
+            padding: 2.2rem 1.8rem 1.8rem;
+            position: relative;
+            box-shadow: 6px 10px 22px rgba(0, 0, 0, 0.5);
+            text-decoration: none;
+            color: var(--ink-color);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid #c9ae91;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Folder tab at the top left */
+        .case-file::before {
+            content: attr(data-tab);
+            position: absolute;
+            top: -24px;
+            left: 16px;
+            background: var(--folder-bg);
+            padding: 4px 16px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            border: 1px solid #c9ae91;
+            border-bottom: none;
+            border-radius: 6px 6px 0 0;
+        }
+
+        .case-file:nth-child(2) {
+            transform: rotate(-2.5deg);
+        }
+
+        .case-file:nth-child(3) {
+            transform: rotate(2deg);
+        }
+
+        .case-file:hover {
+            transform: scale(1.04) rotate(0deg);
+            box-shadow: 10px 16px 28px rgba(0, 0, 0, 0.65);
+            z-index: 15;
+        }
+
+        /* Inner white document sheet */
+        .inner-sheet {
+            background: #fdfbf7;
+            padding: 1.25rem;
+            border: 1px solid #dcd7c9;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.04);
+            position: relative;
+            flex-grow: 1;
+        }
+
+        .evidence-tag {
+            display: inline-block;
+            background: #222;
+            color: #fff;
+            padding: 2px 8px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            margin-bottom: 0.75rem;
+            letter-spacing: 1px;
+        }
+
+        .course-code {
+            font-size: 1.35rem;
+            font-weight: bold;
+            margin: 0 0 0.4rem 0;
+        }
+
+        .course-title {
+            font-size: 0.95rem;
+            line-height: 1.4;
+            margin: 0 0 1.2rem 0;
             color: #333;
         }
-        .container {
-            text-align: center;
-            background: #ffffff;
-            padding: 2.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-        a {
+
+        .stamp {
             display: inline-block;
+            color: var(--stamp-red);
+            border: 3px double var(--stamp-red);
+            padding: 0.25rem 0.6rem;
+            font-weight: 900;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            transform: rotate(-6deg);
             margin-top: 1rem;
-            padding: 0.75rem 1.5rem;
-            background-color: #c00000;
-            color: #ffffff;
-            text-decoration: none;
-            border-radius: 4px;
-            font-weight: 600;
+            align-self: flex-end;
+            opacity: 0.85;
         }
-        a:hover {
-            background-color: #990000;
+
+        .case-file:hover .stamp {
+            opacity: 1;
+            background-color: rgba(163, 22, 33, 0.08);
+        }
+
+        @media (max-width: 768px) {
+            .string-connector {
+                display: none;
+            }
+            .board-grid {
+                gap: 2.5rem;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>TU/e — 1ZV60 O
+
+    <div class="caution-tape">DO NOT CROSS // EXAM AREA</div>
+
+    <div class="header-note">
+        <div class="pin"></div>
+        <h1>TU/e Investigation Board</h1>
+        <p>SELECT A CASE FILE TO BEGIN INTERROGATION (PRACTICE)</p>
+    </div>
+
+    <div class="board-grid">
+        <div class="string-connector"></div>
+
+        <!-- Case 1: 1ZV60 -->
+        <a href="1ZV60_oefenmodule.html" class="case-file" data-tab="CASE #1ZV60">
+            <div class="pin"></div>
+            <div class="inner-sheet">
+                <span class="evidence-tag">EXHIBIT A // Q1</span>
+                <h2 class="course-code">1ZV60</h2>
+                <p class="course-title">Methodology for IE Research</p>
+            </div>
+            <span class="stamp">Open Dossier &rarr;</span>
+        </a>
+
+        <!-- Case 2: 1JV00 / 1JP00 -->
+        <a href="WOP_practice_module.html" class="case-file" data-tab="CASE #1JP00">
+            <div class="pin"></div>
+            <div class="inner-sheet">
+                <span class="evidence-tag">EXHIBIT B // Q1</span>
+                <h2 class="course-code">1JP00 / 1JV00</h2>
+                <p class="course-title">Work and Organisational Psychology</p>
+            </div>
+            <span class="stamp">Open Dossier &rarr;</span>
+        </a>
+    </div>
+
+</body>
+</html>
