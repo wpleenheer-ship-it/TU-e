@@ -140,7 +140,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
 #dash .meta{display:block;line-height:1.5}
 #dashTop{margin-bottom:4px}
 .crow{
-  display:grid;grid-template-columns:3em 1fr 4em 7em;gap:10px;align-items:center;
+  display:grid;grid-template-columns:3.8em 1fr 4em 7em;gap:10px;align-items:center;
   padding:6px 8px;cursor:pointer;font-size:.9rem;border-bottom:1px dashed var(--line)
 }
 .crow:hover{background:var(--postit)}
@@ -201,7 +201,7 @@ button:disabled{opacity:.45;cursor:not-allowed}
   .postit-link{top:22px;left:20px;width:122px;padding:9px 10px 11px;font-size:.62rem}
   .caution-tape{top:30px;right:16px;font-size:.58rem;padding:15px 9px;letter-spacing:.08em}
   .caution-tape .tue{margin-right:6px;padding:0 4px}
-  .crow{grid-template-columns:2.6em 1fr 3.4em 5.6em;gap:6px}
+  .crow{grid-template-columns:3.4em 1fr 3.4em 5.6em;gap:6px}
 }
 @media (max-width:370px){
   .caution-tape .tue{display:none}
@@ -280,8 +280,9 @@ button:disabled{opacity:.45;cursor:not-allowed}
 /* =====================================================================
    DATASET – vragen toevoegen:
    QUESTIONS.push(Q(chapterNumber, "Question", ["option a","option b","option c","option d"], indexOfCorrectOption(0-3), "Rationale"));
-   The id is assigned automatically. Chapters 1–25 appear in the menu automatically.
+   The id is assigned automatically. Chapters 1–25 appear in the menu automatically; chapter 26 = "Bonus".
    ===================================================================== */
+const chName = c => c === 26 ? "Bonus" : "H" + c;
 let _id = 0;
 const Q = (chapter, question, opts, c, rationale) => ({
   id: ++_id, chapter, question,
@@ -640,7 +641,28 @@ const QUESTIONS = [
   Q(25,"What is meta-ethnography?",["An approach using quantitative techniques to analyze many ethnographic studies", "An approach to primary analysis", "Translation of qualitative studies into one another", "All of the above"],2,"Meta-ethnography (Noblit & Hare) is a qualitative synthesis method where concepts across ethnographic studies are translated into one another."),
   Q(25,"Which of the following is not a phase of meta-ethnography?",["Deciding what is relevant to the initial interest", "Conducting ethnographic data collection", "Translating the studies into each other", "Expressing the synthesis"],1,"Meta-ethnography is a secondary synthesis of existing published qualitative studies; it does not involve collecting new primary ethnographic data."),
   Q(25,"Which of the following is not an advantage of qualitative data analysis software?",["It makes the retrieval process faster and more efficient", "It requires researchers to be more explicit about their analytical processes", "It makes interpreting data easier", "It makes collaborative research projects easier to manage"],2,"Software speeds up text retrieval and coding organization, but the substantive interpretation of meaning remains the researcher's analytical task."),
-  Q(25,"Is it recommended to use data analysis software for a student project?",["Yes, it should be used for a project of any size", "For a small data set it may not be worth the time and effort to learn how to use it", "Only if the project has two researchers working on it", "Only if the project is being conducted online"],1,"For smaller student projects with a handful of interviews, the learning curve of complex CAQDAS software can outweigh the practical benefit of manual coding.")
+  Q(25,"Is it recommended to use data analysis software for a student project?",["Yes, it should be used for a project of any size", "For a small data set it may not be worth the time and effort to learn how to use it", "Only if the project has two researchers working on it", "Only if the project is being conducted online"],1,"For smaller student projects with a handful of interviews, the learning curve of complex CAQDAS software can outweigh the practical benefit of manual coding."),
+  /* ---- BONUS (chapter 26): lecture-based practice questions ---- */
+  Q(26,"A researcher tests the Technology Acceptance Model, which is expected to hold for all potential users of new computer technologies. She e-mails a survey to 300 Dutch students who might use a smartwatch. What is the DOMAIN in this study?",["The 300 Dutch students who received the e-mail", "All potential users of smartwatches in the Netherlands", "All potential users of new computer technologies", "One potential user of a new computer technology"],2,"Domain = all instances to which the theory is expected to apply. The 300 students are the sample, smartwatch users in the Netherlands the population, and one potential user the unit of analysis."),
+  Q(26,"A purchasing manager knows the rule: 'When insufficient information is given to the supplier, raw materials arrive late.' Raw materials arrive late, so she concludes that insufficient information was provided. Which type of reasoning is this?",["Induction", "Deduction", "Falsification", "Abduction"],3,"Abduction: given a rule and an effect, you infer a possible cause. Induction goes from cause and effect to a rule, deduction from rule and cause to an effect. The conclusion is only a possible cause, not a certain one."),
+  Q(26,"A researcher believes that phenomena have subjective meaning for the actors involved, tries to understand that meaning through interviews, and accepts that her own experience influences her interpretation. Which combination describes her position?",["Objectivism and positivism", "Constructivism and interpretivism", "Objectivism and interpretivism", "Constructivism and positivism"],1,"Constructivism (ontology): phenomena and their meanings are constantly accomplished by actors. Interpretivism (epistemology): the aim is to understand, and being objective and value-free is neither possible nor desirable. Positivism assumes value-free observers who explain through tested 'laws'."),
+  Q(26,"Which of the following questions is best studied with the EMPIRICAL cycle rather than the problem-solving cycle?",["How can we reduce food waste at the local Albert Heijn?", "Does more spending on advertising lead to more sales?", "Too many trains in the Netherlands are delayed.", "How can the invoicing process of this company be made faster?"],1,"The empirical cycle answers 'how to explain it?': a generic relationship between variables, tested for generalisable insight. The other three are context-specific performance problems ('how to make it work?'), so the problem-solving cycle fits."),
+  Q(26,"A multiple-case study deliberately selects cases for which the researcher expects DIFFERENT findings, for predictable theoretical reasons. This is called:",["Literal replication", "Theoretical replication", "Triangulation", "Theoretical saturation"],1,"Literal replication: cases where similar findings are expected. Theoretical replication: cases where different findings are expected (Yin, 2009). Triangulation converges multiple sources on one finding; saturation is the point where new data add no new insight."),
+  Q(26,"You prepare a semi-structured interview about stock ordering. Which question is best?",["Why do you always order more stock than required?", "Don't you agree that the current process leads to ordering too much?", "Is the ordering process a problem for you?", "Think about the last time you had capacity issues. What happened?"],3,"A good interview question is open, concrete and neutral. The first two are leading or loaded and assume a problem. 'Is the ordering process a problem for you?' is a closed yes/no question that gives little information."),
+  Q(26,"In the Gioia method, a researcher groups participants' own words (in-vivo labels) into broader researcher-derived themes and then into aggregate dimensions. Which analytical step corresponds most closely to axial and selective coding?",["1st-order analysis", "Open coding", "2nd-order analysis", "Transcription"],2,"1st-order analysis is informant-centric (similar to open coding). 2nd-order analysis is researcher-centric: themes and dimensions, similar to axial and selective coding. These are then shown in the data structure."),
+  Q(26,"A student counts that 'research methods' was mentioned four times in the interviews and concludes it is the most important course. Which coding mistake is this?",["Overcoding / lack of focus", "Failing to reach saturation", "Skipping constant comparison", "Uncalled quantitative sensemaking"],3,"Counting codes only makes sense for certain research questions (e.g. template coding). One remark can be more insightful than a frequent one. Lack of focus means coding everything instead of what matters for the research question."),
+  Q(26,"Salary is positively related to job satisfaction. When money stress is added to the analysis, the salary-satisfaction relation is no longer significant, while salary predicts money stress and money stress predicts satisfaction. What does this show?",["Moderation", "Partial mediation", "Full mediation", "Confounding by money stress"],2,"Money stress is a mediator: it explains the IV-DV relation. If the IV-DV relation is no longer significant it is full mediation; if it stays significant it is partial mediation. A moderator would change the strength of the relation depending on its level."),
+  Q(26,"Which of the following is NOT one of the four types of evidence needed to claim causality?",["Theoretical support", "Temporal sequence", "Random sampling of respondents", "Non-spurious covariance"],2,"The four types are theoretical support, systematic covariation, temporal sequence and non-spurious covariance. Random sampling concerns generalisation to a population, not causality. Random assignment (not sampling) is a requirement of true experiments."),
+  Q(26,"A highly controlled laboratory experiment with random assignment shows a clear effect of noise on concentration. Critics say the result may not hold in real offices. Which type of validity is mainly under threat?",["Internal validity", "Measurement validity", "External (ecological) validity", "Reliability"],2,"High control increases internal validity but lowers external validity: generalisation to real-life settings (ecological validity). Internal and external validity are reciprocally related."),
+  Q(26,"A company gives a stress-reduction programme to the employees with the highest stress scores. At the post-test, their scores have dropped, but a comparison with similar high scorers who did not take part is missing. Which threat to internal validity is most plausible?",["History", "Experiment mortality", "Instrumentation", "Statistical regression"],3,"Regression to the mean: extremely high scores tend to decrease on re-measurement even without an intervention. A control group would help to separate this from a real effect."),
+  Q(26,"In a survey on workload among teachers, the teachers with the heaviest workload have no time to respond, so the sample shows a lower average workload than the population. Which bias is this?",["Voluntary response bias", "Social desirability bias", "Non-response bias", "Extreme-scoring tendency"],2,"Non-response bias: those who do not participate differ systematically from those who do. Voluntary response bias is when people select themselves into the sample (often on controversial topics) and over-represent strong opinions."),
+  Q(26,"Respondents give their age in years. The researcher recodes it into 0-25, 26-50, 51-75 and 76+. What was the original scale level and what is it after recoding?",["Interval, then nominal", "Ratio, then ordinal", "Ratio, then interval", "Interval, then ordinal"],1,"Age in years has an absolute zero (ratio). Ordered categories keep order but lose equal distances, so they are ordinal. Recoding can only go down the hierarchy, so aim for the highest level possible when measuring."),
+  Q(26,"The items of a scale have clearly unequal factor loadings. Which statement about reliability estimates is correct?",["Cronbach's alpha underestimates reliability, while McDonald's omega remains accurate", "Cronbach's alpha overestimates reliability, while omega underestimates it", "Both are unaffected by unequal loadings", "Omega requires equal loadings, alpha does not"],0,"Alpha assumes equal item loadings (tau-equivalence) and underestimates reliability if they differ. Omega is based on the factor model and allows different loadings (congeneric items). In both cases the rule of thumb in this course is at least .60."),
+  Q(26,"You want to replicate the factor structure of an existing, validated scale and use only the shared (common) variance of the items. Which technique fits best?",["Principal component analysis", "Principal axis factoring", "Cronbach's alpha", "Linear regression"],1,"Principal axis factoring is confirmative and excludes unique variance (factor reproduction). PCA is explorative and uses all variance; it is used for item reduction of a newly developed scale."),
+  Q(26,"A researcher doubles the sample size of a (non-probability) convenience sample. What is the most accurate conclusion?",["Both sampling error and sampling bias are reduced", "Sampling bias is removed, sampling error is unchanged", "Sampling error decreases, but sampling bias is not fixed by a larger sample", "Neither changes, because only response rate matters"],2,"A larger sample reduces random sampling error (more precision) but cannot repair systematic distortion, such as over-representation of easily reached people."),
+  Q(26,"A probability sample gives a mean of 50 with a standard error of 2. What is the 95% confidence interval?",["48.0 to 52.0", "46.1 to 53.9", "42.1 to 57.9", "50.0 to 53.9"],1,"CI = mean ± 1.96 × SE = 50 ± 3.92 = 46.08 to 53.92. A smaller standard error gives a narrower, more precise interval."),
+  Q(26,"A researcher uses aggregated CBS Statline figures per municipality to conclude something about the behaviour of individual employees. Which problem occurs?",["Ecological fallacy", "Respondent reactivity", "Social desirability bias", "Panel attrition"],0,"Ecological fallacy: inferences about individuals cannot be drawn from aggregated data. Official statistics are unobtrusive (no reactivity), which is an advantage, but they do not match every research need."),
+  Q(26,"In the Ahrend cause-effect diagram, which of the following is a ROOT cause (internal) rather than an external trigger?",["Economic crisis", "Increased competition", "Inadequate leadership, too product oriented", "Customer trends towards more service"],2,"External triggers (PESTEL and Porter's forces) lie outside the system boundary: economy, competition, customer trends, new technologies. Root causes are internal: structure, culture, strategy, systems, staff, leadership, capabilities. The diagram should stay simple (max 12/14 concepts) and converge to one symptom.")
 ];
 /* ===================== EINDE DATASET ===================== */
 
@@ -651,7 +673,7 @@ let session = [], idx = 0, correct = 0, wrongIds = [], picked = null, answered =
 (function buildMenu(){
   const cnt = {}; QUESTIONS.forEach(q => cnt[q.chapter] = (cnt[q.chapter]||0)+1);
   let h = `<option value="all">Full practice exam – all chapters (${QUESTIONS.length})</option>`;
-  for (let c = 1; c <= 25; c++) h += `<option value="${c}" ${cnt[c]?"":"disabled"}>H${c} (${cnt[c]||0} questions)</option>`;
+  for (let c = 1; c <= 26; c++) h += `<option value="${c}" ${cnt[c]?"":"disabled"}>${chName(c)} (${cnt[c]||0} questions)</option>`;
   $("chSel").innerHTML = h;
 })();
 
@@ -668,11 +690,11 @@ function mastered(id){ const r = load()[id]; return !!r && r.a >= 2 && r.c / r.a
 function renderDash(){
   const d = load(), by = {}; QUESTIONS.forEach(q => (by[q.chapter] = by[q.chapter] || []).push(q));
   let tot = 0, mas = 0, ok1 = 0, learned = 0, h = "";
-  for (let c = 1; c <= 25; c++){ const qs = by[c]; if (!qs) continue;
+  for (let c = 1; c <= 26; c++){ const qs = by[c]; if (!qs) continue;
     const m = qs.filter(q => mastered(q.id)).length, seen = qs.filter(q => d[q.id]).length;
     const o1 = qs.filter(q => d[q.id] && d[q.id].c > 0).length, p1 = Math.round(o1 / qs.length * 100);
     const p = Math.round(m / qs.length * 100), done = p >= 90; tot += qs.length; mas += m; ok1 += o1; if (done) learned++;
-    h += `<div class="crow" data-c="${c}"><b>H${c}</b><div class="bar" title="${p1}% answered correctly at least once · ${p}% mastered"><i class="lt" style="width:${p1}%"></i><i style="width:${p}%"></i></div><span class="cp">${p}%${done ? " ✔" : ""}</span><span class="cs">${seen}/${qs.length} seen</span></div>`;
+    h += `<div class="crow" data-c="${c}"><b>${chName(c)}</b><div class="bar" title="${p1}% answered correctly at least once · ${p}% mastered"><i class="lt" style="width:${p1}%"></i><i style="width:${p}%"></i></div><span class="cp">${p}%${done ? " ✔" : ""}</span><span class="cs">${seen}/${qs.length} seen</span></div>`;
   }
   const P = tot ? Math.round(mas / tot * 100) : 0, P1 = tot ? Math.round(ok1 / tot * 100) : 0;
   $("dashTop").innerHTML = `<b>${P}% mastered</b> (${mas} of ${tot} questions) · ${P1}% answered correctly at least once · ${learned} chapters learnt`;
@@ -706,7 +728,7 @@ function render(){
   $("prog").textContent = `Question ${idx+1} of ${session.length}`;
   $("score").textContent = `✔ ${correct}  ✘ ${idx - correct}`;
   $("barFill").style.width = (idx/session.length*100) + "%";
-  $("chLabel").textContent = `Chapter ${q.chapter}`;
+  $("chLabel").textContent = (q.chapter === 26 ? "Bonus" : `Chapter ${q.chapter}`);
   $("qText").textContent = q.question;
   $("opts").innerHTML = "";
   q.options.forEach(o => {
@@ -780,7 +802,7 @@ function finish(){
     d.className = "wrong";
     const ans = q.options.find(o => o.letter === q.correctAnswer).text;
     d.innerHTML = `<b></b><br><span style="color:var(--ok)"></span>`;
-    d.firstChild.textContent = `H${q.chapter}: ${q.question}`;
+    d.firstChild.textContent = `${chName(q.chapter)}: ${q.question}`;
     d.lastChild.textContent = `Correct: ${q.correctAnswer}. ${ans}`;
     $("wrongList").appendChild(d);
   });
