@@ -186,7 +186,7 @@
             justify-content: center;
             align-items: flex-start;
             position: relative;
-            max-width: 1000px;
+            max-width: 1240px;
             width: 100%;
             z-index: 5;
         }
@@ -195,8 +195,8 @@
         .string-horizontal {
             position: absolute;
             top: 18px;
-            left: 22%;
-            right: 22%;
+            left: 17%;
+            right: 17%;
             height: 3px;
             background-color: var(--red-string);
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
@@ -211,7 +211,7 @@
             flex-direction: column;
             align-items: center;
             position: relative;
-            width: 360px;
+            width: 340px;
         }
 
         /* Vertical red yarn connecting the dossier to the NotebookLM note below */
@@ -264,6 +264,10 @@
 
         .case-column:nth-child(3) .case-file {
             transform: rotate(2deg);
+        }
+
+        .case-column:nth-child(4) .case-file {
+            transform: rotate(-1.5deg);
         }
 
         .case-file:hover {
@@ -348,6 +352,10 @@
             transform: rotate(-2.5deg);
         }
 
+        .case-column:nth-child(4) .notebook-note {
+            transform: rotate(2deg);
+        }
+
         .notebook-note:hover {
             transform: scale(1.05) rotate(0deg) !important;
             box-shadow: 8px 12px 22px rgba(0, 0, 0, 0.6);
@@ -387,6 +395,13 @@
             font-weight: bold;
             color: #004d99;
             text-decoration: underline;
+        }
+
+        /* The red yarn only makes sense while all three files sit on one row */
+        @media (max-width: 1280px) {
+            .string-horizontal {
+                display: none;
+            }
         }
 
         @media (max-width: 900px) {
@@ -467,6 +482,29 @@
                 <div class="pin blue"></div>
                 <span class="note-label">Evidence Log // NotebookLM</span>
                 <h3 class="note-title">1JP00 Intel &amp; Notes</h3>
+                <p class="note-desc">Stored background information, course sources, and extra practice exercises.</p>
+                <span class="external-tag">Access Informant File &nearr;</span>
+            </a>
+        </div>
+
+        <!-- Column 3: 1ZP50H -->
+        <div class="case-column">
+            <a href="1ZP50H_practice_module.html" class="case-file" data-tab="CASE #1ZP50H">
+                <div class="pin"></div>
+                <div class="inner-sheet">
+                    <span class="evidence-tag">EXHIBIT C // Q1</span>
+                    <h2 class="course-code">1ZP50H</h2>
+                    <p class="course-title">Product Innovation Processes</p>
+                </div>
+                <span class="stamp">Start Practice &rarr;</span>
+            </a>
+
+            <div class="string-vertical"></div>
+
+            <a href="https://notebook.google.com/notebook/17fb9bbe-dcc6-4e28-8e7a-64cf04bb7836" target="_blank" rel="noopener noreferrer" class="notebook-note">
+                <div class="pin blue"></div>
+                <span class="note-label">Evidence Log // NotebookLM</span>
+                <h3 class="note-title">1ZP50H Intel &amp; Notes</h3>
                 <p class="note-desc">Stored background information, course sources, and extra practice exercises.</p>
                 <span class="external-tag">Access Informant File &nearr;</span>
             </a>
