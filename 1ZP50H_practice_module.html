@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1ZP50H Practice Module – Case File</title>
+<style>
+/* ===== TU/e Crime Scene Investigation Board theme ===== */
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;min-height:100vh;font-family:"Courier New",Courier,monospace;color:#1c1c1c;line-height:1.5;
+background-color:#8c6239;background-image:radial-gradient(circle at 20% 30%,rgba(255,255,255,.07) 0 2px,transparent 3px),radial-gradient(circle at 70% 60%,rgba(0,0,0,.12) 0 2px,transparent 3px),radial-gradient(circle at 50% 50%,rgba(0,0,0,.06) 0 1px,transparent 2px);background-size:23px 23px,31px 31px,13px 13px;
+border:16px solid #3d2610;box-shadow:inset 0 0 50px rgba(0,0,0,.75)}
+.wrap{position:relative;max-width:860px;margin:0 auto;padding:130px 16px 48px}
+.post-it{position:absolute;top:8px;left:8px;background:#fff68f;color:#1c1c1c;padding:10px 14px;font-weight:bold;font-size:.8rem;text-decoration:none;transform:rotate(-3deg);box-shadow:3px 4px 8px rgba(0,0,0,.5);z-index:5}
+.tape{position:absolute;top:18px;right:-6px;transform:rotate(2.5deg);pointer-events:none;z-index:5;padding:6px 14px;font-weight:bold;font-size:.8rem;letter-spacing:1px;color:#1c1c1c;background:repeating-linear-gradient(-45deg,#f7c600 0 16px,#1c1c1c 16px 32px);box-shadow:0 3px 6px rgba(0,0,0,.4)}
+.tape span{background:#f7c600;padding:2px 8px}
+.tape i{font-style:normal;background:#1c1c1c;color:#f7c600;padding:1px 6px;margin-left:6px}
+header.label{position:relative;display:block;width:fit-content;max-width:100%;margin:0 auto 34px;background:#fdfbf7;padding:14px 26px;transform:rotate(-1.2deg);box-shadow:2px 4px 10px rgba(0,0,0,.45);text-align:center}
+header.label::before{content:"";position:absolute;top:-14px;left:50%;width:110px;height:26px;margin-left:-55px;background:rgba(230,204,178,.8);transform:rotate(2deg);box-shadow:0 1px 2px rgba(0,0,0,.25)}
+h1,h2,h3{text-transform:uppercase;border-bottom:2px solid #1c1c1c;padding-bottom:4px;margin:0 0 12px;letter-spacing:1px}
+h1{font-size:1.35rem;border:0;margin:0}
+.sub{font-size:.8rem;margin:2px 0 0}
+.card{position:relative;background:#fdfbf7;border:1px solid #cdbfa5;border-top:14px solid #e6ccb2;padding:26px 22px 20px;margin:0 0 42px;box-shadow:4px 6px 12px rgba(0,0,0,.5)}
+.card::before{content:"";position:absolute;top:-24px;left:50%;width:18px;height:18px;margin-left:-9px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff6b6b,#a31621 60%,#5a0b12);box-shadow:2px 4px 4px rgba(0,0,0,.5)}
+.card::after{content:"CASE FILE";position:absolute;top:-30px;left:14px;background:#e6ccb2;font-size:.65rem;font-weight:bold;padding:2px 10px 0;border-radius:4px 4px 0 0;display:none}
+.card.tabbed::after{display:block}
+.hidden{display:none!important}
+.notice{background:#fff68f;padding:10px 12px;font-size:.82rem;transform:rotate(-.4deg);box-shadow:2px 3px 6px rgba(0,0,0,.35);margin:0 0 16px}
+label.fl{display:block;font-weight:bold;text-transform:uppercase;font-size:.8rem;margin:14px 0 4px}
+select,.chip{font:inherit;background:#f4eee1;color:#1c1c1c;border:2px solid #1c1c1c;padding:7px 10px;cursor:pointer}
+select{width:100%}
+select:hover,.chip:hover,.chip.on,.chip:active{background:#fff68f}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip.on{font-weight:bold;box-shadow:inset 0 0 0 2px #1c1c1c}
+.btn{font:inherit;background:transparent;color:#a31621;border:3px double #a31621;padding:9px 18px;text-transform:uppercase;font-weight:bold;letter-spacing:1px;cursor:pointer;margin:12px 10px 0 0;transition:transform .15s}
+.btn:hover{transform:rotate(-2deg);background:rgba(163,22,33,.07)}
+.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
+.dash-row{display:grid;grid-template-columns:150px 1fr 70px;gap:10px;align-items:center;margin:7px 0;font-size:.82rem;cursor:pointer;padding:2px 4px}
+.dash-row:hover{background:#fff68f}
+.bar{position:relative;height:16px;border:2px solid #1c1c1c;background:#f4eee1;overflow:hidden}
+.bar .l1,.bar .l2{position:absolute;top:0;left:0;bottom:0}
+.bar .l1{background:#d2b48c}.bar .l2{background:#1b5e20}
+.bar.big{height:22px}
+.meta{display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;font-weight:bold;font-size:.85rem;margin-bottom:8px}
+.qtext{font-size:1.05rem;font-weight:bold;border-bottom:2px solid #1c1c1c;padding-bottom:8px;margin:16px 0 22px}
+.opt{position:relative;display:block;width:100%;text-align:left;font:inherit;background:#f4eee1;color:#1c1c1c;border:0;border-left:6px solid #8c6239;padding:12px 14px;margin:0 0 20px;cursor:pointer;box-shadow:1px 2px 3px rgba(0,0,0,.25)}
+.opt:hover,.opt:focus-visible{background:#fff68f}
+.opt:disabled{opacity:1;cursor:default;color:#1c1c1c}
+.opt b{margin-right:8px;text-transform:uppercase}
+.opt.correct{background:#e8f5e9;border-left-color:#1b5e20;outline:2px solid #1b5e20;outline-offset:-5px}
+.opt.wrong{background:#ffebee;border-left-color:#a31621;outline:2px solid #a31621;outline-offset:-5px}
+.opt.correct::after,.opt.wrong::after{position:absolute;top:-11px;right:12px;background:#fdfbf7;font-size:.7rem;font-weight:bold;letter-spacing:1px;padding:0 6px;border:2px double;transform:rotate(-3deg)}
+.opt.correct::after{content:"VERIFIED";color:#1b5e20}
+.opt.wrong::after{content:"REJECTED";color:#a31621}
+#fb{margin-top:6px;padding:14px;border:3px double;font-size:.9rem}
+#fb.ok{border-color:#1b5e20;color:#1b5e20;background:#e8f5e9}
+#fb.bad{border-color:#a31621;color:#a31621;background:#ffebee}
+#fb h3{border-bottom:2px solid currentColor;display:inline-block;transform:rotate(-1.5deg)}
+#fb p{margin:6px 0;color:#1c1c1c}
+.wrongitem{border-left:6px solid #a31621;background:#f4eee1;padding:10px 12px;margin:0 0 14px;font-size:.88rem}
+.big-score{font-size:2.2rem;font-weight:bold;color:#a31621}
+canvas#cf{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:50}
+a:focus-visible,button:focus-visible,select:focus-visible,.chip:focus-visible,.dash-row:focus-visible{outline:3px solid #1c1c1c;outline-offset:2px}
+@media(max-width:640px){body{border-width:8px}.wrap{padding-top:110px}.post-it{font-size:.62rem;padding:6px 8px}.tape{font-size:.58rem;padding:4px 8px;top:14px}.card{padding:22px 14px 16px}.dash-row{grid-template-columns:90px 1fr 54px;font-size:.72rem}h1{font-size:1.05rem}}
+@media(max-width:370px){.tape i{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important;scroll-behavior:auto!important}.btn:hover,header.label,.post-it,.tape,.notice,#fb h3{transform:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="post-it" href="https://wpleenheer-ship-it.github.io/TU-e/">← RETURN TO EVIDENCE BOARD</a>
+<div class="tape"><span>DO NOT CROSS // EXAM AREA</span><i>TU/e</i></div>
+<header class="label"><h1>1ZP50H – Practice Case File</h1><p class="sub">Sample multiple-choice questions · 50 exhibits</p></header>
+
+<section id="start" class="card tabbed">
+  <h2>Open a new investigation</h2>
+  <div class="notice" id="provNotice">⚠ PROVISIONAL ANSWER KEY: the source PDF contains no answers or explanations. The correct answers here are my own best reading of the course material and are NOT verified. Check them in the book.</div>
+  <label class="fl" for="chapterSel">Chapter / set</label><select id="chapterSel"></select>
+  <label class="fl">Questions per session</label><div class="chips" id="countChips"></div>
+  <label class="fl">Question pool</label><div class="chips" id="modeChips"></div>
+  <button class="btn" id="startBtn">Start session</button>
+  <h2 style="margin-top:30px">Case progress</h2>
+  <div id="dash"></div>
+  <button class="btn" id="exportBtn">Export</button><button class="btn" id="importBtn">Import</button><button class="btn" id="resetBtn">Reset progress</button>
+  <input type="file" id="importFile" accept="application/json" class="hidden">
+</section>
+
+<section id="quiz" class="card hidden">
+  <div class="meta"><span id="qCount"></span><span id="scoreLive"></span></div>
+  <div class="bar big"><div class="l2" id="progBar" style="width:0"></div></div>
+  <div class="qtext" id="qText"></div>
+  <div id="opts"></div>
+  <div id="fb" class="hidden"></div>
+  <button class="btn" id="nextBtn" disabled>Next question</button><button class="btn" id="stopBtn">Stop</button>
+</section>
+
+<section id="results" class="card hidden">
+  <h2>Case closed – results</h2>
+  <div class="big-score" id="resScore"></div>
+  <p id="resMsg"></p>
+  <h3>Rejected exhibits</h3><div id="wrongList"></div>
+  <button class="btn" id="retryBtn">Retry wrong ones</button><button class="btn" id="homeBtn">Back to start</button>
+</section>
+</div>
+<canvas id="cf"></canvas>
+
+<script>
+/* ===== QUESTION DATA (generated from the PDF by script; do not edit by hand) =====
+   Q(chapter, question, [options], correctIndex, rationale)
+   Questions flagged with a trailing 'true' have a PROVISIONAL answer (no answer key in the source PDF). */
+const QUESTIONS = [];
+let _id = 0;
+function Q(chapter, question, options, correctIndex, rationale, prov){
+  QUESTIONS.push({id:'q'+(++_id), chapter, question,
+    options: options.map((t,i)=>({letter:'abcd'[i], text:t})),
+    correctAnswer:'abcd'[correctIndex], rationale: rationale||'', prov: !!prov});
+}
+const CHAPTER_NAMES = {1:'Set 1 (Q1–10)',2:'Set 2 (Q11–20)',3:'Set 3 (Q21–30)',4:'Set 4 (Q31–40)',5:'Set 5 (Q41–50)',6:'2014 exam – multiple choice',7:'2015 exam – multiple choice',8:'2015 exam – true/false'};
+Q(1, "According to the latest Comparative Performance Assessment Study (CPAS), in comparison to the Rest, Best companies are:", ["more likely to use tradeoff analysis.", "less likely to rely on portfolio analysis for product selection.", "more likely to employ informal processes for selecting which concepts to develop.", "less likely to rely on online communities for information gathering."], 0, "", true);
+Q(1, "Which of the following statements is True? i. The development and launch phase of the new products process comprise what is popularly called the \"fuzzy front end\". ii. One of the benefits of accelerating time to market is that the product will be on the market for a longer period of time before becoming obsolete.", ["Only statement (i) is True", "Only statement (ii) is True", "Both statements (i) and (ii) are True", "Both statements (i) and (ii) are False"], 1, "", true);
+Q(1, "New-to-the-firm products are:", ["inventions that create a whole new market", "products that take a firm into a category new to it.", "products that are new to the world, but are not new to the firm.", "products that are retargeted for a new use or application."], 1, "", true);
+Q(1, "Having the right mix of high- versus low-risk projects in a company's innovation funnel is part of having a good ________.", ["platform strategy", "launch strategy", "risk mitigation strategy", "portfolio strategy"], 3, "");
+Q(1, "Which of the following is the most common source for the needs and problems of stakeholders?", ["Internal records", "Problem analysis", "Scenario analysis", "Direct inputs from marketing departments"], 3, "", true);
+Q(1, "The first step in the process of creating a product innovation charter (PIC) for a firm is to:", ["rate and rank the strengths of the firm.", "fill out the PIC form.", "identify the weaknesses of the firm.", "look for opportunities, inside the firm or outside it."], 3, "", true);
+Q(1, "Which of the following statements is True?", ["The new products process essentially turns a profit flow into an opportunity.", "The development and launch phase of the new products process comprise what is popularly called the \"fuzzy front end\".", "A fully screened product passes the test of fit with a company's situation.", "A recommended way to cope when facing a high-turbulence environment is to encourage inflexibility by freezing a product concept until the last possible moment."], 2, "", true);
+Q(1, "Concept testing is sometimes called concept _____ to reinforce the idea of helping the item, not just killing it off.", ["checking", "development", "validation", "evaluation"], 1, "", true);
+Q(1, "Among the product attributes, which of the following is a feature?", ["Uses", "Structures", "Sensory enjoyments", "Savings"], 1, "", true);
+Q(1, "Which of the following guidelines should a company keep in mind when (re-)designing its new product development process?", ["The process should be adjustable to different project types.", "The process should consist of three general stages.", "The process should be a tunnel not a funnel.", "The process should be applicable in a step-by-step manner."], 0, "");
+Q(2, "With reference to the three inputs required by the creation process, _____ is the source by which the form is attained.", ["Design", "Potential", "Technology", "Benefit"], 2, "", true);
+Q(2, "Which of the following statements describes the discovery of a potentially successful new product idea? We found ________.", ["a solution for an urgent customer problem.", "an objective, unserved customer need.", "an easily and inexpensive to develop new technology.", "a hidden and unsolved customer problem."], 3, "");
+Q(2, "A new product appears first as a(n) _____.", ["prototype", "idea", "model", "code"], 1, "", true);
+Q(2, "Why should companies encourage the use of electronic brainstorming instead of traditional brainstorming for new product idea generation? Electronic brainstorming ________.", ["better supports group think.", "inhibits the bazooka effect.", "prevents discussions of ideas.", "stimulates individual contribution."], 1, "");
+Q(2, "Which of the following customer research methods is most useful to identify the motivations and values behind the problems or needs of customers?", ["Complaint analysis", "Conjoint analysis", "Ethnography", "Interviews"], 3, "");
+Q(2, "Which of the following managerial guidelines applies to all idea or concept evaluations throughout the development process?", ["The idea source should not be included in the evaluation committee.", "The evaluations should be made in a purely rational manner.", "The market potential of the resulting new product is the most important criterion.", "The risk of making an evaluation mistake should be managed through mitigation."], 3, "");
+Q(2, "What is the major advantage of using role playing as a method to identify customer problems?", ["It is the least time consuming method and can be used when there is not much time for research.", "The team can uncover problems that customers do not recognize themselves.", "The team can easily communicate the findings by showing pictures and videos.", "It is the most inexpensive method because no customers have to be paid for their participation."], 1, "");
+Q(2, "In a decay curve, a slow decay means that ________.", ["projects tend to be stopped later.", "the evaluation gates are less ‘fuzzy’.", "the evaluation gates have more ‘teeth’.", "development costs are avoided."], 0, "");
+Q(2, "________ is defined as the process a company employs to externally search for and source research, new technologies, and products.", ["T-P-M linkage", "Open innovation", "Creative abrasion", "Leveraged creativity"], 1, "");
+Q(2, "The full screen often involves the use of a _____, which is an arrangement of checklist factors with weights (importances) on them.", ["gap map", "scoring model", "perceptual map", "rank order"], 1, "", true);
+Q(3, "Which of the following outcomes of a risk/payoff matrix, used for evaluating a new product process, is most likely to be the costliest for the firm?", ["Stopping a project that is likely to fail.", "Continuing a project that is likely to fail.", "Stopping a project that is likely to succeed.", "Continuing a project that is likely to succeed."], 2, "");
+Q(3, "In product development, a ________ is defined as a set of systems and interfaces that form a common structure from which derivative products are created.", ["product architecture", "product strategy", "product platform", "product portfolio"], 2, "");
+Q(3, "In the A-T-A-R Model the 'T' stands for ________.", ["Test", "Trial", "Turn-over", "Tactical"], 1, "");
+Q(3, "Which of the following statements is true?", ["In a new product development process, the financial analysis generally begins with the calculation of the net present value, NPV.", "In addition to the considerations of time and cost, one should also consider product and market newness when selecting the most appropriate forecasting model.", "Laggards refer to those users who will be among the first to try the product.", "Factor analysis can be used to estimate the net present value of a new product when it is still in the concept stage."], 1, "", true);
+Q(3, "Which of the following statements is true of product design?", ["Product design is a multi-functional activity where all functions need to be involved.", "The design of a new product should be considered only after the product architecture has been developed.", "The design of a new product is the task of industrial or product designers.", "Firms that are judged to be higher in design effectiveness tend to report lower profits due to higher R&D expenditure."], 0, "");
+Q(3, "With reference to the design process, the practice of putting the various individuals or functional areas in close proximity as to shorten communication lines and increase team cohesion is called ________.", ["relocation", "resettlement", "colocation", "approximation"], 2, "");
+Q(3, "In which of the following organizational options does the project manager have the least amount of power?", ["Project matrix option", "Venture option", "Functional matrix option", "Functional option"], 3, "");
+Q(3, "Who amongst the following has the role of \"pushing\" product projects past obstacles or roadblocks?", ["Ad hoc team member", "Product champion", "Isolate", "Extended team member"], 1, "", true);
+Q(3, "Which of the following statements is true?", ["Product design is used to pretty-up a product that is about ready to be manufactured.", "A product design which is developed in collaboration with end users and which captures the voice of the customer is known as a universal design.", "Design for ergonomics is the technique by which products can be taken apart after use for separate recycling of metal, glass, and plastic parts.", "Most of the problems surrounding design have to do with concurrency, or overlapping the steps in development."], 3, "", true);
+Q(3, "The majority of the strategic launch decisions should be made ________.", ["at the beginning of the launch phase.", "before testing of the final product.", "during the front end phase.", "at the beginning of the development phase."], 2, "");
+Q(4, "The first 5 to 10 percent of customers who adopt a new product are referred to as the ________.", ["innovators", "early adopters", "laggards", "early majority"], 1, "Note: Innovators are the first 2.5%; Early Adopters make up the next ~10-13.5%, or first 5–10% depending on textbook classification after initial pioneers");
+Q(4, "At which point in the launch cycle do the launch expenditures generally increase most heavily?", ["During pre-launch", "During beachhead", "Before the announcement", "During early growth"], 1, "");
+Q(4, "_____ information in combination with brand perceptions can be very helpful in developing a product positioning strategy.", ["End-use segment", "Geographic segment", "Demographic segment", "Benefit segment"], 3, "", true);
+Q(4, "Devising a method for testing the end users' experience with a new item is called _____.", ["concept testing", "prototype testing", "field testing", "copy testing"], 1, "", true);
+Q(4, "In the context of a bubble diagram, incremental change on both extent of product change and extent of process change dimensions leads to _____.", ["next-generation products", "new product platforms", "enhancement products", "breakthroughs"], 2, "", true);
+Q(4, "When technical departments in firms form ties with universities, government units, private research centers, and even competitors to access what they need, it is referred to as _____.", ["strategic alliances", "cartel arrangements", "usury agreements", "portfolio networks"], 0, "", true);
+Q(4, "The trial phase in the adoption of a new product ________.", ["involves large scale usage of the product.", "occurs before the awareness phase.", "permits customers to verify claims about the product.", "involves no cost for both the firm and the customers."], 2, "");
+Q(4, "Training of sales and other promotional people, building service capability, putting out preannouncements if they are in order, and arranging for stocking of a new product at the reseller level takes place during the _____ of a launch cycle.", ["announcement stage", "prelaunch stage", "early growth stage", "late growth stage"], 1, "", true);
+Q(4, "Which of the following is a controlled sale market testing method that involves real purchasing under some real competitive environment?", ["Concept testing", "Direct marketing", "Speculative sale", "Simulated test market"], 1, "", true);
+Q(4, "The final step in the launch management system is:", ["selecting potential problems to control.", "selecting the trigger points.", "developing contingency plans.", "ranking and controlling potential problems."], 2, "", true);
+Q(5, "A(n) _____ is designed to capture the events leading up to a product launch and to try to understand the thinking behind the actions taken.", ["after-action review (AAR)", "A-T-A-R model", "expected effects matrix", "hierarchy of events matrix"], 0, "", true);
+Q(5, "Controlled-distribution scanner markets are based on scanner technology and have received much attention in the _____ field.", ["industrial goods", "consumer packaged goods", "consumer services", "industrial services"], 1, "", true);
+Q(5, "In launch management, tracking variables should be relevant, measurable, and _____.", ["precise", "endogenous", "controllable", "predictable"], 0, "", true);
+Q(5, "Which of the statements is True about the revisiting the strategic goals?", ["Product cost is one of the common customer acceptance measures used by firms as goals for individual products.", "The cash-to-cash metric shows the time between the initial cash investment and the time of payment for a finished product.", "The launch plan for a new-to-the-world product is expected to stimulate replacement demand rather than primary demand.", "Strategic givens are more easily modified as compared to tactical decisions."], 1, "", true);
+Q(5, "The new product development team members who are involved in managing functional clusters comprise the _____ team.", ["product champions", "ad hoc", "core", "extended"], 2, "", true);
+Q(5, "Which of the following is the first step in the process for product architecture?", ["Clustering the geometric elements", "Creating the product schematic", "Creating the geometric layout", "Checking interactions between chunks"], 1, "", true);
+Q(5, "In the context of the scoring model, culling factors should generally be established in the _____.", ["marketing report", "product innovation charter", "firm’s mission statement", "articles of incorporation"], 1, "", true);
+Q(5, "The value of an established brand is called its _____.", ["brand mark", "brand identity", "brand equity", "brand recognition"], 2, "", true);
+Q(5, "The phenomenon of _____ is the tendency of respondents to mention minor, but frequently encountered, problems first.", ["reverse brainstorming", "omniscient proximity", "observational projection", "brainsketching"], 2, "", true);
+Q(5, "Product attributes used in gap analysis, which differentiate between offerings and are important in consumer purchase decisions, are called _____ attributes.", ["purchase", "consumer", "developmental", "determinant"], 3, "", true);
+Q(6, "By definition, new product teams are ________, which means a greater variety of perspectives but also potential difficulties in reaching a solution acceptable to all.", ["cross-functional", "monopolistic", "highly bureaucratic", "iconoclastic"], 0, "");
+Q(6, "Which of the following statements is true of metrics for innovation?", ["It is not an effective practice to get external validation for performance metrics.", "Performance metrics need to be adjusted and fine-tuned through time, so that they are aligned with business goals.", "In the recent times, there has been a drastic decline in the use of social media metrics in launch management.", "The fewer the performance metrics, the greater the conflict between themselves."], 1, "");
+Q(6, "Which of the following categories of new products would present the highest risks and uncertainties as well as associated costs of development and launch?", ["Line extensions", "New-to-the-world products", "Improvised products", "Repositionings"], 1, "");
+Q(6, "Which of the following is the key advantage of a product platform?", ["It increases brand awareness.", "It increases the market capitalization of the organization.", "It offers cost efficiencies.", "It improves the quality of the product."], 2, "");
+Q(6, "________ helps a firm assess which new products would be the best additions to existing product lines, given both financial and strategic objectives.", ["A product finances charter", "Product portfolio management", "A product assessment matrix", "Product value-add assessment"], 1, "");
+Q(6, "The best new product ideas are based on ________.", ["channel desires", "manufacturing efficiencies", "profit goals", "customer problems"], 3, "");
+Q(6, "Which of the following would qualify as an outside source of ready-made new product concepts?", ["New products people", "Marketing teams", "Manufacturing teams", "Lead users"], 3, "");
+Q(6, "Which of the following ways can be considered by a firm to encourage creativity among employees?", ["Avoiding training programs as creatives cannot benefit from training", "Being less tolerant of aberrations", "Allowing free time for innovation", "Encouraging reproductive thinking"], 2, "");
+Q(6, "Which of the following is an advantage that electronic brainstorming has over traditional brainstorming?", ["It allows only one person to talk at a time.", "It prevents participants from all answering at once.", "It encourages \"social loafing\".", "It allows participants to answer anonymously."], 3, "");
+Q(6, "Which of the following is true of role playing as a research technique?", ["There is substantial evidence of its successful use in generating ideas for new products.", "This technique tends to undermine creativity.", "It would be valuable in instances where product users are unable to verbalize their reactions.", "It would not be suitable in instances where consumers are emotionally unwilling to express their views."], 2, "");
+Q(6, "Crunchie Cereals Inc., in order to better anticipate customer needs, sent its product and marketing teams to visit the homes of those U.S. families that regularly used its products. Based on the data gathered from analyzing consumer behavior, the product managers concluded that office-going customers would like to have their cereal on the go. Keeping this in mind, Crunchie Cereals came up with a new \"Crunch-on-the-go\" portable package. Identify the methodology used to gather information regarding customer needs in this scenario.", ["Focus groups", "Observation", "Interviewing", "Screening"], 1, "");
+Q(6, "One of the dimensions used by the bothersomeness technique for ranking and sorting problems according to their severity or importance is the ________.", ["cost of resolving the problem", "frequency of the problem", "time required to resolve the problem", "complexity of the problem"], 1, "");
+Q(6, "The assumption behind the use of conjoint analysis is that:", ["a product is considered as a whole rather than in discrete attributes.", "a product can be represented as a set or bundle of attributes.", "the number of items per purchase is a constant to scale market share.", "preferences can be observed by testing of many virtual variations of the same basic concept."], 1, "");
+Q(6, "Lexus Inc. is interested in determining whether a potential new product will be preferred by customers, even before it is launched. Since customers reactions cannot be gauged at this stage, the firm can make use of ________ to gather pieces of information that can substitute for what it wants to learn.", ["surrogate questions", "perceptual mapping", "fundamental analysis", "lexical analysis"], 0, "");
+Q(6, "In the A-T-A-R model the R stands for ________.", ["rate", "response", "repeat", "region"], 2, "");
+Q(6, "Which of the following statements about the new product evaluation process is untrue?", ["The assumption that a product development plan is mostly tentative.", "Form and positioning can usually be changed during the process.", "Everything in new product work should be keyed to a Go/No Go decision.", "Customer attitudes usually tend to change along the entire process."], 2, "");
+Q(6, "The farther a new product idea is allowed to proceed through the development process:", ["lesser the number of people who believe in the concept.", "the tougher it is to stop the product.", "the easier it is to wave aside the hurdles.", "the lesser support it receives from R&D workers."], 1, "");
+Q(6, "Which of the following is true of a decay curve?", ["It is primarily a plan rather than a result.", "It depicts the entire life cycle of product.", "Decisions on the risk matrix lead to the idea of a decay curve.", "Synchronization of the two aspects in a decay curve, plan and result, reduces its value as a managerial concept."], 2, "");
+Q(6, "Alpha tests are generally conducted amongst:", ["regular customers outside the organization", "employees of a firm", "irregular customers outside the organization", "employees of a competing firm"], 1, "");
+Q(6, "Businesses are using a(n) ________ when they put their corporate name on every product they make.", ["customized brand strategy", "umbrella brand strategy", "flagship brand strategy", "individual brand strategy"], 1, "");
+Q(6, "When a firm chooses an aggressive market entry to launch a new product:", ["most of the promotional budget is spent early.", "most of the resources go to stimulating repeat purchases.", "the firm's spending strategy is too stingy.", "the firm may be uncertain about the capability of its sales force."], 0, "");
+Q(6, "America First Electronics Inc. (AFE) is preparing to launch a set of new-to-the-world medical devices that are based on the same technology. These devices promise to revolutionize the healthcare industry. AFE must ideally attempt to stimulate:", ["primary demand for the product category.", "joint demand for the product category.", "selective demand for the product category.", "replacement demand for the product category."], 0, "");
+Q(6, "In product commercialization, ________ define how the strategic decisions will be implemented.", ["strategic action decisions", "tactical launch decisions", "platform decisions", "competitive decisions"], 1, "");
+Q(6, "In most cases, the first step towards adoption of a new product is ________.", ["availability", "testing", "trial", "awareness"], 3, "");
+Q(6, "Which of the following is the strongest argument for conducting market testing as late as possible in the development process?", ["It has least risk from competitors.", "It is more useful and more reliable.", "It minimizes costs.", "It speeds up the market entry."], 1, "");
+Q(7, "When comparing the results of the comparative performance assessment study by the Product Development & Management Association from 2012 with the previous results from 2004 the following trend can be observed:", ["There is a trend away from formal development processes and toward more flexibility in product development.", "There is a trend toward using less formal processes in the front end of new product development.", "There is a trend toward conducting more formal portfolio reviews and using more portfolio management techniques.", "There is a trend away from using and conducting many of the available product development tools, techniques and practices."], 2, "");
+Q(7, "In class we have discussed the different objectives of new product development. Based on this discussion, in which situation should a company consider a new product that got launched on the market as a true failure?", ["When the launched new product does not generate any profit after the forecasted time to break-even has passed.", "When the development and launch of the new product does not deliver any added value to the company.", "When the market for the launched new product is already declining before the sales is taking off.", "When the final new product does not deliver any added value to the customers when it is launched on the market."], 1, "");
+Q(7, "Which of the following product innovation types is newest to the market?", ["Repositionings", "Cost reductions", "Improvements of existing products", "Line extensions"], 3, "");
+Q(7, "During the guest lecture several properties of the technical launch at ASML were discussed. Which of the following is one of the key challenges during the technical launch process of ASML?", ["High time pressure from the customers.", "Assuring the aesthetic properties of the product.", "Having a standardized product.", "Selecting the appropriate test software."], 0, "");
+Q(7, "The impact factor of a scientific journal reflects the ________.", ["average number of citations to articles published in that journal.", "average number of articles published in other journals citing this journal.", "total number of citations to articles published in that journal.", "total number of articles published in other journals citing this journal."], 0, "");
+Q(7, "When looking at the best performing companies in the comparative performance assessment study by the Product Development & Management Association from 2012 the following observation can be made: The majority of the best performing companies have applied a ________.", ["reactive strategy", "niche strategy", "fast follower strategy", "first-to-market strategy"], 3, "");
+Q(8, "When looking at the results of the comparative performance assessment study by the Product Development & Management Association from 2012 the following observations can be made: The product development processes of 'the Best' performing companies are more flexible than the processes of 'the Rest'.", ["True", "False"], 0, "");
+Q(8, "Solving lower level customer problems often leads to product improvements.", ["True", "False"], 0, "");
+Q(8, "New product idea generation always starts with determining the category of interest.", ["True", "False"], 1, "");
+Q(8, "A new product can always be clearly classified as either a good or a service.", ["True", "False"], 1, "Products lie on a goods-services continuum");
+Q(8, "'Fast-moving consumer goods' can also be considered as 'durable goods'.", ["True", "False"], 1, "FMCGs are non-durable goods");
+Q(8, "Sales forecasts should be conducted before every idea or concept evaluation.", ["True", "False"], 1, "Full sales forecasts are not feasible or necessary at initial screening gates");
+Q(8, "The advantage of a new product idea or concept is the most important criterion in every evaluation step throughout the development process.", ["True", "False"], 0, "Product advantage is consistently the #1 success factor");
+Q(8, "The key decision in the beachhead phase of the launch cycle is when to end it.", ["True", "False"], 0, "");
+Q(8, "Deciding for the use of a penetration pricing strategy is one of the strategic launch decisions to be taken for a new product.", ["True", "False"], 1, "Pricing is a tactical launch marketing-mix decision, whereas platform, target market, positioning, and aggressiveness are strategic");
+Q(8, "For fast-moving-consumer goods the key launch objective is repeated purchase and not product trial.", ["True", "False"], 0, "Trial alone is insufficient for low-margin FMCGs; sustained repeat purchase drives profitability");
+
+/* ===== STORAGE (localStorage with in-memory fallback) ===== */
+const KEY='tue_1zp50h_progress_v1';
+let mem={};
+function load(){try{const r=localStorage.getItem(KEY);return r?JSON.parse(r):{}}catch(e){return mem}}
+function save(p){mem=p;try{localStorage.setItem(KEY,JSON.stringify(p))}catch(e){}}
+let progress=load();
+/* Mastered: >=2 attempts with >=90% correct, OR 4 correct answers in a row (recovers quickly after a mistake) */
+const mastered=id=>{const s=progress[id];return !!s&&((s.a>=2&&s.c/s.a>=0.9)||(s.s||0)>=4)};
+const seenOk=id=>!!progress[id]&&progress[id].c>=1;
+
+/* ===== HELPERS ===== */
+const $=id=>document.getElementById(id);
+const chapters=[...new Set(QUESTIONS.map(q=>q.chapter))].sort((a,b)=>a-b);
+const byChapter=c=>QUESTIONS.filter(q=>q.chapter===c);
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let count='10',mode='all';
+
+/* ===== START SCREEN ===== */
+function chips(el,items,cur,cb){el.innerHTML='';items.forEach(([v,l])=>{const b=document.createElement('button');b.type='button';b.className='chip'+(v===cur?' on':'');b.textContent=l;b.onclick=()=>{cb(v);[...el.children].forEach(x=>x.classList.remove('on'));b.classList.add('on')};el.appendChild(b)})}
+function buildStart(){
+  const sel=$('chapterSel'),keep=sel.value||'all';
+  sel.innerHTML='<option value="all">Full practice exam – all chapters ('+QUESTIONS.length+')</option>'+
+    chapters.map(c=>'<option value="'+c+'">'+(CHAPTER_NAMES[c]||'Chapter '+c)+' ('+byChapter(c).length+')'+(learned(c)?' ✔':'')+'</option>').join('');
+  sel.value=keep;
+  chips($('countChips'),[['10','10'],['20','20'],['all','All']],count,v=>count=v);
+  chips($('modeChips'),[['all','All questions'],['new','Only new and not yet mastered']],mode,v=>mode=v);
+  const np=QUESTIONS.filter(q=>q.prov).length,pn=$('provNotice');
+  pn.classList.toggle('hidden',!np);pn.textContent='⚠ '+np+' questions have a PROVISIONAL answer (the source PDF has no answer key). They are flagged in the feedback box; please verify them in the course book.';
+  const tot=QUESTIONS.length,m=QUESTIONS.filter(q=>mastered(q.id)).length,s=QUESTIONS.filter(q=>seenOk(q.id)).length;
+  let h=row('Overall','all',s,m,tot);
+  chapters.forEach(c=>{const l=byChapter(c);h+=row((CHAPTER_NAMES[c]||'Chapter '+c)+(learned(c)?' ✔':''),c,l.filter(q=>seenOk(q.id)).length,l.filter(q=>mastered(q.id)).length,l.length)});
+  $('dash').innerHTML=h;
+  $('dash').querySelectorAll('.dash-row').forEach(r=>{const go=()=>{$('chapterSel').value=r.dataset.c};r.onclick=go;r.onkeydown=e=>{if(e.key==='Enter')go()}});
+}
+function learned(c){const l=byChapter(c);return l.length>0&&l.filter(q=>mastered(q.id)).length/l.length>=0.9}
+function row(label,c,seen,m,tot){return '<div class="dash-row" tabindex="0" data-c="'+c+'"><span>'+esc(label)+'</span><div class="bar"><div class="l1" style="width:'+(tot?seen/tot*100:0)+'%"></div><div class="l2" style="width:'+(tot?m/tot*100:0)+'%"></div></div><span>'+seen+'/'+tot+' seen</span></div>'}
+
+/* ===== SESSION ===== */
+let deck=[],idx=0,right=0,wrongIds=[],answered=false,active=false;
+function begin(list){
+  deck=list;idx=0;right=0;wrongIds=[];active=true;
+  $('start').classList.add('hidden');$('results').classList.add('hidden');$('quiz').classList.remove('hidden');
+  show();
+}
+$('startBtn').onclick=()=>{
+  const c=$('chapterSel').value;
+  let pool=c==='all'?QUESTIONS:byChapter(+c);
+  if(mode==='new')pool=pool.filter(q=>!mastered(q.id));
+  if(!pool.length){alert('No questions available for this selection. Everything here is already mastered!');return}
+  pool=shuffle(pool);if(count!=='all')pool=pool.slice(0,+count);
+  begin(pool);
+};
+function show(){
+  answered=false;const q=deck[idx];
+  $('qCount').textContent='Question '+(idx+1)+' of '+deck.length;
+  $('scoreLive').textContent='✔ '+right+'  ✘ '+(idx-right);
+  $('progBar').style.width=(idx/deck.length*100)+'%';
+  $('qText').textContent=q.question;
+  $('opts').innerHTML='';
+  q.options.forEach(o=>{const b=document.createElement('button');b.type='button';b.className='opt';b.dataset.l=o.letter;b.innerHTML='<b>'+o.letter+'.</b>'+esc(o.text);b.onclick=()=>pick(o.letter);$('opts').appendChild(b)});
+  $('fb').className='hidden';$('nextBtn').disabled=true;
+  $('nextBtn').textContent=idx===deck.length-1?'Last question – finish':'Next question';
+}
+function pick(l){
+  if(answered||!deck[idx].options.some(o=>o.letter===l))return;answered=true;
+  const q=deck[idx],ok=l===q.correctAnswer;
+  const s=progress[q.id]||{a:0,c:0,s:0};s.a++;if(ok)s.c++;s.s=ok?(s.s||0)+1:0;progress[q.id]=s;save(progress);
+  if(ok)right++;else wrongIds.push(q.id);
+  document.querySelectorAll('.opt').forEach(b=>{b.disabled=true;if(b.dataset.l===q.correctAnswer)b.classList.add('correct');else if(b.dataset.l===l)b.classList.add('wrong')});
+  const fb=$('fb');fb.className=ok?'ok':'bad';
+  fb.innerHTML='<h3>'+(ok?'Verified / Cleared':'Rejected / Discrepancy')+'</h3>'+(ok?'<p>Correct!</p>':'<p>Wrong – correct answer: '+q.correctAnswer+'.</p>')+
+    (q.rationale?'<p>'+esc(q.rationale)+'</p>':'')+(q.prov?'<p><i>Provisional answer: the source PDF supplies no answer key. Verify in the course book.</i></p>':'');
+  $('scoreLive').textContent='✔ '+right+'  ✘ '+(idx+1-right);
+  $('nextBtn').disabled=false;
+  if(ok)confetti();
+}
+function next(){if(!answered)return;if(idx<deck.length-1){idx++;show()}else finish(deck.length)}
+$('nextBtn').onclick=next;
+$('stopBtn').onclick=()=>finish(idx+(answered?1:0));
+function finish(n){
+  active=false;$('quiz').classList.add('hidden');$('results').classList.remove('hidden');
+  const pct=n?Math.round(right/n*100):0;
+  $('resScore').textContent=right+' / '+n+' ('+pct+'%)';
+  $('resMsg').textContent=n===0?'No questions answered.':pct>=90?'Excellent work, detective.':pct>=60?'Solid effort – review the rejected exhibits below.':'More investigation needed.';
+  $('wrongList').innerHTML=wrongIds.length?wrongIds.map(id=>{const q=QUESTIONS.find(x=>x.id===id),c=q.options.find(o=>o.letter===q.correctAnswer);return '<div class="wrongitem"><b>'+esc(q.question)+'</b><br>Correct answer: '+c.letter+'. '+esc(c.text)+'</div>'}).join(''):'<p>None. Clean sheet!</p>';
+  $('retryBtn').classList.toggle('hidden',!wrongIds.length);
+  window.scrollTo(0,0);
+}
+$('retryBtn').onclick=()=>begin(shuffle(wrongIds.map(id=>QUESTIONS.find(q=>q.id===id))));
+$('homeBtn').onclick=()=>{$('results').classList.add('hidden');$('start').classList.remove('hidden');buildStart()};
+
+/* ===== PROGRESS TOOLS ===== */
+$('resetBtn').onclick=()=>{if(confirm('Reset ALL progress? This cannot be undone.')){progress={};save(progress);buildStart()}};
+$('exportBtn').onclick=()=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(progress)],{type:'application/json'}));a.download='1zp50h-progress.json';a.click()};
+$('importBtn').onclick=()=>$('importFile').click();
+$('importFile').onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(typeof d!=='object'||!d)throw 0;progress=d;save(progress);buildStart()}catch(x){alert('That file is not a valid progress export.')}};r.readAsText(f)};
+
+/* ===== KEYBOARD ===== */
+document.addEventListener('keydown',e=>{
+  if(!active||e.ctrlKey||e.metaKey||e.altKey)return;
+  const k=e.key.toLowerCase();
+  if('abcd'.includes(k)&&k.length===1){pick(k)}
+  else if(k==='enter'||k==='arrowright'){if(answered){e.preventDefault();next()}}
+});
+
+/* ===== CONFETTI (canvas, no libraries) ===== */
+const COLS=['#a31621','#1b5e20','#fff68f','#e6ccb2','#1c1c1c','#f7c600'];
+function confetti(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const cv=$('cf'),cx=cv.getContext('2d');cv.width=innerWidth;cv.height=innerHeight;
+  const ps=Array.from({length:90},()=>({x:innerWidth/2,y:innerHeight*.45,vx:(Math.random()-.5)*14,vy:-Math.random()*13-3,s:Math.random()*7+4,r:Math.random()*6,c:COLS[Math.floor(Math.random()*COLS.length)]}));
+  let f=0;(function t(){cx.clearRect(0,0,cv.width,cv.height);ps.forEach(p=>{p.vy+=.35;p.x+=p.vx;p.y+=p.vy;p.r+=.2;cx.save();cx.translate(p.x,p.y);cx.rotate(p.r);cx.fillStyle=p.c;cx.fillRect(-p.s/2,-p.s/2,p.s,p.s*.6);cx.restore()});if(++f<110)requestAnimationFrame(t);else cx.clearRect(0,0,cv.width,cv.height)})();
+}
+buildStart();
+</script>
+</body>
+</html>
