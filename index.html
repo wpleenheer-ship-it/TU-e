@@ -418,6 +418,167 @@
                 gap: 3rem;
             }
         }
+
+        /* ---------- Quarter switch: Q2 active board, Q1 cold-case archive ---------- */
+        .quarter-radio {
+            position: absolute;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .quarter-tabs {
+            display: flex;
+            gap: 0.6rem;
+            margin: -1.5rem 0 3.2rem;
+            z-index: 6;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .quarter-tabs label {
+            background: #f4eee1;
+            border: 1px solid #1c1c1c;
+            border-left: 6px solid #8c6239;
+            padding: 0.7rem 1.1rem;
+            font-weight: bold;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 3px 4px 8px rgba(0, 0, 0, 0.4);
+            min-height: 44px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .quarter-tabs label small {
+            font-size: 0.7rem;
+            font-weight: normal;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .quarter-tabs label:hover,
+        #q2:checked ~ .quarter-tabs label[for="q2"],
+        #q1:checked ~ .quarter-tabs label[for="q1"] {
+            background: #fff68f;
+        }
+
+        #q2:checked ~ .quarter-tabs label[for="q2"],
+        #q1:checked ~ .quarter-tabs label[for="q1"] {
+            box-shadow: inset 0 0 0 2px #1c1c1c, 3px 4px 8px rgba(0, 0, 0, 0.4);
+            transform: rotate(-1deg);
+        }
+
+        #q2:focus-visible ~ .quarter-tabs label[for="q2"],
+        #q1:focus-visible ~ .quarter-tabs label[for="q1"] {
+            outline: 3px solid #1c1c1c;
+            outline-offset: 3px;
+        }
+
+        .quarter-board { display: none; }
+        #q2:checked ~ .board-q2,
+        #q1:checked ~ .board-q1 { display: flex; }
+
+        .board-caption {
+            width: 100%;
+            text-align: center;
+            margin: -1.2rem 0 0.4rem;
+            color: #fdfbf7;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        /* Q2: post-it with the lines of inquiry (not a link) */
+        .inquiry-note { cursor: default; }
+        .inquiry-note:hover { transform: rotate(3deg) !important; box-shadow: 4px 8px 16px rgba(0, 0, 0, 0.45); }
+        .inquiry-note ol {
+            margin: 0.3rem 0 0;
+            padding-left: 1.3rem;
+            font-size: 0.78rem;
+            line-height: 1.45;
+        }
+
+        /* Q2: reserved space for the next course file */
+        .reserved-slot {
+            width: 100%;
+            min-height: 230px;
+            border: 3px dashed rgba(253, 251, 247, 0.55);
+            color: rgba(253, 251, 247, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+        }
+
+        .reserved-slot span {
+            font-size: 0.75rem;
+            font-weight: normal;
+            text-transform: none;
+            letter-spacing: 0;
+            margin-top: 0.5rem;
+        }
+
+        /* Q1: cold cases look older but stay fully usable */
+        .board-q1 .case-file {
+            filter: sepia(0.35) saturate(0.85);
+        }
+
+        .board-q1 .case-file:hover {
+            filter: none;
+        }
+
+        .cold-stamp {
+            position: absolute;
+            top: 0.9rem;
+            right: 0.8rem;
+            color: var(--stamp-red);
+            border: 3px double var(--stamp-red);
+            padding: 0.15rem 0.5rem;
+            font-weight: 900;
+            font-size: 0.75rem;
+            letter-spacing: 2px;
+            transform: rotate(8deg);
+            opacity: 0.8;
+            background: rgba(253, 251, 247, 0.6);
+        }
+
+        @media (max-width: 640px) {
+            .quarter-tabs label { font-size: 0.8rem; padding: 0.6rem 0.8rem; }
+            .case-column { width: min(340px, 100%); }
+        }
+
+
+        /* Furniture scrolls away with the page instead of floating over the cases */
+        html { overflow-x: clip; }
+        .caution-tape { position: absolute; }
+        .tue-plaque { position: absolute; }
+        .notebook-note { padding-top: 2.2rem; }
+
+        @media (max-width: 900px) {
+            .tue-plaque { position: relative; }
+        }
+
+        @media (max-width: 640px) {
+            body { border-width: 10px; padding: 2.5rem 1rem; }
+            .caution-tape { top: 12px; right: -70px; font-size: 0.65rem; letter-spacing: 2px; padding: 4px 70px; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .case-file, .notebook-note { transition: none; }
+            .case-file:hover, .notebook-note:hover { transform: none !important; }
+            #q2:checked ~ .quarter-tabs label[for="q2"],
+            #q1:checked ~ .quarter-tabs label[for="q1"] { transform: none; }
+        }
     </style>
 </head>
 <body>
@@ -438,7 +599,63 @@
         <p>SELECT A CASE FILE TO BEGIN INTERROGATION OR CONSULT INTEL ARCHIVES</p>
     </div>
 
-    <div class="board-grid">
+    <!-- Quarter switch: Q2 is shown by default, Q1 is the archive -->
+    <input type="radio" name="quarter" id="q2" class="quarter-radio" checked>
+    <input type="radio" name="quarter" id="q1" class="quarter-radio">
+
+    <div class="quarter-tabs">
+        <label for="q2" id="tab-q2">Q2 // Active cases <small>(current)</small></label>
+        <label for="q1" id="tab-q1">Q1 // Cold cases <small>(archive)</small></label>
+    </div>
+
+    <div class="board-grid quarter-board board-q2" aria-labelledby="tab-q2">
+        <p class="board-caption">Q2 // open investigations</p>
+
+        <!-- Column 1: Statistics -->
+        <div class="case-column">
+            <a href="Stats_Lab.html" class="case-file" data-tab="CASE #STATS">
+                <div class="pin"></div>
+                <div class="inner-sheet">
+                    <span class="evidence-tag">EXHIBIT D // Q2</span>
+                    <h2 class="course-code">STATISTICS</h2>
+                    <p class="course-title">Stats Lab: interactive masterclass built from the T-exercises</p>
+                </div>
+                <span class="stamp">Open Masterclass &rarr;</span>
+            </a>
+
+            <div class="string-vertical"></div>
+
+            <div class="notebook-note inquiry-note">
+                <div class="pin blue"></div>
+                <span class="note-label">Lines of inquiry // 12 topics</span>
+                <h3 class="note-title">From density to regression</h3>
+                <ol>
+                    <li>Density &amp; area</li>
+                    <li>Exponential</li>
+                    <li>Poisson &amp; Erlang</li>
+                    <li>Central limit theorem</li>
+                    <li>Joint &amp; correlation</li>
+                    <li>Adding normals, max/min</li>
+                    <li>Bias &amp; MSE</li>
+                    <li>Confidence intervals</li>
+                    <li>Hypothesis tests</li>
+                    <li>Chi-square</li>
+                    <li>Paired vs independent</li>
+                    <li>Regression</li>
+                </ol>
+            </div>
+        </div>
+
+        <!-- Template for the next Q2 course: copy a Q1 column, change the link, codes and tab text,
+             and replace this reserved slot with it -->
+        <div class="case-column">
+            <div class="reserved-slot">Space reserved for the next case<span>Pin a new Q2 course file here.</span></div>
+        </div>
+
+    </div>
+
+    <div class="board-grid quarter-board board-q1" aria-labelledby="tab-q1">
+        <p class="board-caption">Q1 archive // cold cases — still open for review</p>
         <div class="string-horizontal"></div>
 
         <!-- Column 1: 1ZV60 -->
@@ -446,11 +663,12 @@
             <a href="1ZV60_oefenmodule.html" class="case-file" data-tab="CASE #1ZV60">
                 <div class="pin"></div>
                 <div class="inner-sheet">
+                    <span class="cold-stamp">COLD CASE</span>
                     <span class="evidence-tag">EXHIBIT A // Q1</span>
                     <h2 class="course-code">1ZV60</h2>
                     <p class="course-title">Methodology for IE Research</p>
                 </div>
-                <span class="stamp">Start Practice &rarr;</span>
+                <span class="stamp">Reopen Practice &rarr;</span>
             </a>
 
             <div class="string-vertical"></div>
@@ -469,11 +687,12 @@
             <a href="WOP_practice_module.html" class="case-file" data-tab="CASE #1JP00">
                 <div class="pin"></div>
                 <div class="inner-sheet">
+                    <span class="cold-stamp">COLD CASE</span>
                     <span class="evidence-tag">EXHIBIT B // Q1</span>
                     <h2 class="course-code">1JP00 / 1JV00</h2>
                     <p class="course-title">Work and Organisational Psychology</p>
                 </div>
-                <span class="stamp">Start Practice &rarr;</span>
+                <span class="stamp">Reopen Practice &rarr;</span>
             </a>
 
             <div class="string-vertical"></div>
@@ -492,11 +711,12 @@
             <a href="1ZP50H_practice_module.html" class="case-file" data-tab="CASE #1ZP50H">
                 <div class="pin"></div>
                 <div class="inner-sheet">
+                    <span class="cold-stamp">COLD CASE</span>
                     <span class="evidence-tag">EXHIBIT C // Q1</span>
                     <h2 class="course-code">1ZP50H</h2>
                     <p class="course-title">Product Innovation Processes</p>
                 </div>
-                <span class="stamp">Start Practice &rarr;</span>
+                <span class="stamp">Reopen Practice &rarr;</span>
             </a>
 
             <div class="string-vertical"></div>
@@ -511,6 +731,11 @@
         </div>
 
     </div>
+
+    <script>
+        // Open the archive directly with index.html#q1
+        if (location.hash === '#q1') document.getElementById('q1').checked = true;
+    </script>
 
 </body>
 </html>
