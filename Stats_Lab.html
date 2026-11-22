@@ -153,7 +153,7 @@ button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #1c1c
 <header class="strip">
 <svg class="logo" viewBox="0 0 56 56" aria-hidden="true"><rect x="4" y="4" width="48" height="48" rx="8" fill="#fdfbf7" stroke="#1c1c1c" stroke-width="3"/><g fill="#a31621"><circle cx="17" cy="17" r="5"/><circle cx="28" cy="28" r="5"/><circle cx="39" cy="39" r="5"/></g></svg>
 <div><h1>Stats Lab: case files</h1><p>Every topic from your T-exercises as a machine you can run. Read the plain words, examine the evidence in the lab, then pass the check.</p></div>
-<div class="meter"><b id="mcount">0 / 12</b> cases closed<div class="bar"><i id="mbar"></i></div></div>
+<div class="meter"><b id="mcount">0 / 15</b> cases closed<div class="bar"><i id="mbar"></i></div></div>
 </header>
 <nav id="nav" class="scroll" aria-label="Topics"></nav>
 <main id="main"></main>
@@ -210,6 +210,80 @@ function readout(box){const r=el('div','read');box.appendChild(r);return items=>
 
 /* ---------- topic labs ---------- */
 const LABS={
+describe(lab){
+ let seed=11;const rnd=()=>(seed=(seed*16807)%2147483647)/2147483647;const rn=()=>Math.sqrt(-2*Math.log(rnd()))*Math.cos(2*Math.PI*rnd());
+ const base=Array.from({length:40},()=>Math.round(62+9*rn()));
+ const F=Fig(lab,380),c=el('div','ctrls');lab.appendChild(c);let view='stem',out=false,drift=false;
+ seg(c,[['stem','Stem-and-leaf'],['hist','Histogram'],['box','Box plot'],['time','Time sequence'],['prob','Probability plot']],'stem',v=>{view=v;go()});
+ const bins=slider(c,{label:'histogram bin width',min:2,max:15,step:1,value:5},go);
+ seg(c,[[0,'No outlier'],[1,'Add outlier (118)']],0,v=>{out=!!v;go()});seg(c,[[0,'Steady machine'],[1,'Machine drifts']],0,v=>{drift=!!v;go()});
+ const R=readout(lab);
+ const data=()=>{const d=base.map((v,i)=>drift?Math.round(v-12+i*0.6):v);if(out)d.push(118);return d};
+ const qt=(s,p)=>{const pos=(s.length+1)*p;const i=Math.floor(pos);if(i<1)return s[0];if(i>=s.length)return s[s.length-1];return s[i-1]+(pos-i)*(s[i]-s[i-1])};
+ const qnorm=p=>{let lo=-8,hi=8;for(let i=0;i<60;i++){const m=(lo+hi)/2;Phi(m)<p?lo=m:hi=m}return (lo+hi)/2};
+ F.draw=(x,w,h)=>{const d=data(),s=[...d].sort((a,b)=>a-b),ink=col('ink'),mu=col('muted');
+  if(view==='stem'){const st={};s.forEach(v=>{const k=Math.floor(v/10);(st[k]=st[k]||[]).push(v%10)});const ks=Object.keys(st).map(Number);const k0=Math.min(...ks),k1=Math.max(...ks);
+   const rows=k1-k0+1,lh=Math.min(30,(h-60)/rows);x.font='600 15px "Courier New",monospace';
+   label(x,'stem | leaf     (stem = tens, leaf = units; 6 | 3 means 63)',20,18,mu);
+   for(let k=k0;k<=k1;k++){const y=44+(k-k0)*lh+lh/2;x.font='600 15px "Courier New",monospace';x.fillStyle=ink;x.textAlign='right';x.textBaseline='middle';x.fillText(String(k),52,y);x.fillText('|',70,y);x.textAlign='left';x.fillStyle=k===11?col('bad'):col('cobalt');x.fillText((st[k]||[]).join(' '),84,y)}x.font='12px Inter,sans-serif';return}
+  if(view==='hist'){const bw=bins(),a=Math.floor(30/bw)*bw,b=Math.ceil(125/bw)*bw,n=Math.round((b-a)/bw);const cnt=new Array(n).fill(0);d.forEach(v=>{const i=Math.min(n-1,Math.floor((v-a)/bw));cnt[i]++});
+   const A=axes(x,w,h,{x0:a,x1:b,y0:0,y1:Math.max(...cnt)*1.15,xl:'strength (MPa above 800)'});x.fillStyle=alpha(col('cobalt'),.7);cnt.forEach((k,i)=>{const x0=A.X(a+i*bw),x1=A.X(a+(i+1)*bw);x.fillRect(x0+1,A.Y(k),x1-x0-2,A.Y(0)-A.Y(k))});
+   label(x,'bar height = number of bolts in that class',A.L+8,A.T+6,mu);return}
+  if(view==='box'){const q1=qt(s,.25),q2=qt(s,.5),q3=qt(s,.75),iqr=q3-q1,lo=s.find(v=>v>=q1-1.5*iqr),hi=[...s].reverse().find(v=>v<=q3+1.5*iqr);
+   const A=axes(x,w,h,{x0:25,x1:125,y0:0,y1:1,noy:1,left:20,xl:'strength (MPa above 800)'});const yc=A.Y(.5),bh=70;
+   x.strokeStyle=ink;x.lineWidth=2;x.fillStyle=alpha(col('accent'),.3);x.fillRect(A.X(q1),yc-bh/2,A.X(q3)-A.X(q1),bh);x.strokeRect(A.X(q1),yc-bh/2,A.X(q3)-A.X(q1),bh);
+   x.beginPath();x.moveTo(A.X(q2),yc-bh/2);x.lineTo(A.X(q2),yc+bh/2);x.moveTo(A.X(lo),yc);x.lineTo(A.X(q1),yc);x.moveTo(A.X(q3),yc);x.lineTo(A.X(hi),yc);x.moveTo(A.X(lo),yc-15);x.lineTo(A.X(lo),yc+15);x.moveTo(A.X(hi),yc-15);x.lineTo(A.X(hi),yc+15);x.stroke();
+   s.filter(v=>v<lo||v>hi).forEach(v=>{x.strokeStyle=col('bad');x.beginPath();x.arc(A.X(v),yc,6,0,7);x.stroke();label(x,'outlier',A.X(v),yc-22,col('bad'),'center',1)});
+   label(x,'Q1',A.X(q1),yc+bh/2+14,ink,'center',1);label(x,'median',A.X(q2),yc-bh/2-14,ink,'center',1);label(x,'Q3',A.X(q3),yc+bh/2+14,ink,'center',1);
+   label(x,'box = middle 50% of the bolts · whiskers reach to 1.5 × IQR',A.L+4,A.T+6,mu);return}
+  if(view==='time'){const A=axes(x,w,h,{x0:0,x1:d.length+1,y0:25,y1:125,xl:'bolt number (order of measuring)'});const m=mean(d);
+   x.strokeStyle=col('muted');x.setLineDash([5,4]);x.beginPath();x.moveTo(A.X(0),A.Y(m));x.lineTo(A.X(d.length+1),A.Y(m));x.stroke();x.setLineDash([]);
+   x.strokeStyle=col('cobalt');x.lineWidth=2;x.beginPath();d.forEach((v,i)=>i?x.lineTo(A.X(i+1),A.Y(v)):x.moveTo(A.X(i+1),A.Y(v)));x.stroke();
+   x.fillStyle=col('cobalt');d.forEach((v,i)=>{x.beginPath();x.arc(A.X(i+1),A.Y(v),3,0,7);x.fill()});label(x,'dashed = mean',A.L+8,A.T+6,mu);return}
+  const n=s.length,zs=s.map((v,j)=>qnorm((j+.5)/n));const A=axes(x,w,h,{x0:25,x1:125,y0:-2.8,y1:2.8,ystep:1,xl:'observed value'});
+  const m=mean(d),sd=Math.sqrt(vari(d));x.strokeStyle=col('accent');x.lineWidth=2;x.beginPath();x.moveTo(A.X(m-2.8*sd),A.Y(-2.8));x.lineTo(A.X(m+2.8*sd),A.Y(2.8));x.stroke();
+  x.fillStyle=col('cobalt');s.forEach((v,j)=>{x.beginPath();x.arc(A.X(v),A.Y(zs[j]),3.5,0,7);x.fill()});
+  label(x,'vertical: expected z-score · dots on the line → data looks normal',A.L+8,A.T+6,mu)};
+ function go(){const d=data(),s=[...d].sort((a,b)=>a-b),q1=qt(s,.25),q3=qt(s,.75);
+  R([['n',d.length],['mean x̄',f(mean(d),2),1],['median',f(qt(s,.5),1),1],['sample s (divide by n − 1)',f(Math.sqrt(vari(d)),2)],['Q1 / Q3',f(q1,2)+' / '+f(q3,2)],['IQR = Q3 − Q1',f(q3-q1,2)],['range = max − min',s[s.length-1]-s[0]]]);F.render()}
+ go()},
+normal(lab){
+ const F=Fig(lab,380),c=el('div','ctrls');lab.appendChild(c);let mode='norm';
+ const b1=el('div');b1.style.display='contents';const b2=el('div');b2.style.display='none';
+ seg(c,[['norm','Normal: butter packs'],['unif','Uniform: waiting for a bus']],'norm',v=>{mode=v;b1.style.display=v==='norm'?'contents':'none';b2.style.display=v==='unif'?'contents':'none';go()});c.appendChild(b1);c.appendChild(b2);
+ const mu=slider(b1,{label:'mean μ (g)',min:480,max:520,step:1,value:500},go),sg=slider(b1,{label:'standard deviation σ (g)',min:2,max:20,step:1,value:10},go);
+ const a=slider(b1,{label:'from a (g)',min:450,max:550,step:1,value:480},go),b=slider(b1,{label:'to b (g)',min:450,max:550,step:1,value:520},go);
+ const ul=slider(b2,{label:'earliest arrival (min)',min:0,max:10,step:1,value:0},go),uh=slider(b2,{label:'latest arrival (min)',min:2,max:20,step:1,value:10},go),uw=slider(b2,{label:'you wait at most (min)',min:0,max:20,step:.5,value:3},go);
+ const R=readout(lab);
+ F.draw=(x,w,h)=>{if(mode==='norm'){const m=mu(),s=sg(),lo=Math.min(a(),b()),hi=Math.max(a(),b());const fx=v=>npdf(v,m,s);
+   const A=axes(x,w,h,{x0:450,x1:550,y0:0,y1:npdf(m,m,s)*1.18,xstep:10,bottom:62,left:70,xl:''});area(x,A,fx,lo,hi,alpha(col('accent'),.55));curve(x,A,fx,450,550,col('cobalt'));
+   x.fillStyle=col('bad');x.textAlign='center';x.textBaseline='top';x.font='600 12px Inter,sans-serif';for(let v=450;v<=550;v+=w<520?20:10){x.fillText(f((v-m)/s,1),A.X(v),h-A.B+24)}x.font='12px Inter,sans-serif';
+   label(x,'g',A.L-24,h-A.B+12,col('muted'),'right',1);label(x,'z',A.L-24,h-A.B+30,col('bad'),'right',1);
+   [-1,1,-2,2].forEach(k=>{const v=m+k*s;if(v>450&&v<550){x.strokeStyle=alpha(col('ink'),.35);x.setLineDash([3,3]);x.beginPath();x.moveTo(A.X(v),A.Y(0));x.lineTo(A.X(v),A.Y(fx(v)));x.stroke();x.setLineDash([])}});
+   label(x,'red row = z = (x − μ)/σ: "how many σ from the middle"',A.L+8,A.T+6,col('ink'))}
+  else{const l=Math.min(ul(),uh()-1),u=uh(),wt=uw(),ht=1/(u-l);const A=axes(x,w,h,{x0:0,x1:21,y0:0,y1:Math.min(.6,ht*1.6),xstep:w<520?5:2,xl:'arrival time of the bus (min)'});
+   const fx=v=>v>=l&&v<=u?ht:0;area(x,A,fx,l,Math.min(wt,u),alpha(col('accent'),.55));
+   x.strokeStyle=col('cobalt');x.lineWidth=2.5;x.beginPath();x.moveTo(A.X(0),A.Y(0));x.lineTo(A.X(l),A.Y(0));x.lineTo(A.X(l),A.Y(ht));x.lineTo(A.X(u),A.Y(ht));x.lineTo(A.X(u),A.Y(0));x.lineTo(A.X(21),A.Y(0));x.stroke();
+   label(x,'height 1/(b − a) = '+f(ht,3)+' so the rectangle has area 1',A.L+8,A.T+6,col('ink'))}};
+ function go(){if(mode==='norm'){const m=mu(),s=sg(),lo=Math.min(a(),b()),hi=Math.max(a(),b()),za=(lo-m)/s,zb=(hi-m)/s;
+   R([['z for a = (a − μ)/σ',f(za,2)],['z for b',f(zb,2)],['P(a < X < b) = Φ(z_b) − Φ(z_a)',f(Phi(zb)-Phi(za),4),1],['P(X < a) = Φ(z_a)',f(Phi(za),4)]])}
+  else{const l=Math.min(ul(),uh()-1),u=uh(),wt=uw();R([['mean (a + b)/2',f((l+u)/2,2)+' min'],['variance (b − a)²/12',f((u-l)**2/12,3)],['P(bus within '+wt+' min)',f(Math.max(0,Math.min(1,(wt-l)/(u-l))),3),1]])}F.render()}
+ go()},
+normbinom(lab){
+ const F=Fig(lab,360),c=el('div','ctrls');lab.appendChild(c);let cc=true;
+ const n=slider(c,{label:'batch size n',min:5,max:100,step:1,value:50},go),p=slider(c,{label:'defect rate p',min:.05,max:.95,step:.01,value:.1,fmt:v=>Math.round(v*100)+'%'},go),k=slider(c,{label:'P(X ≤ k), k =',min:0,max:100,step:1,value:7},go);
+ seg(c,[[1,'With continuity correction'],[0,'Without']],1,v=>{cc=!!v;go()});
+ const R=readout(lab);
+ F.draw=(x,w,h)=>{const N=n(),P=p(),m=N*P,s=Math.sqrt(N*P*(1-P)),K=Math.min(k(),N);const k0=Math.max(0,Math.floor(m-4*s)),k1=Math.min(N,Math.ceil(m+4*s));
+  const top=Math.max(binom(N,Math.round(m),P),npdf(m,m,s))*1.2;const A=axes(x,w,h,{x0:k0-.5,x1:k1+.5,y0:0,y1:top,xl:'number of defects'});const bw=A.X(1)-A.X(0);
+  area(x,A,v=>npdf(v,m,s),k0-.5,Math.min(k1+.5,cc?K+.5:K),alpha(col('accent'),.35));
+  for(let j=k0;j<=k1;j++){const q=binom(N,j,P);x.fillStyle=j<=K?alpha(col('cobalt'),.75):alpha(col('grey'),.5);x.fillRect(A.X(j)-bw/2+1,A.Y(q),bw-2,A.Y(0)-A.Y(q))}
+  curve(x,A,v=>npdf(v,m,s),k0-.5,k1+.5,col('accent'));
+  const cut=cc?K+.5:K;x.strokeStyle=col('ink');x.setLineDash([4,4]);x.beginPath();x.moveTo(A.X(cut),A.T);x.lineTo(A.X(cut),A.Y(0));x.stroke();x.setLineDash([]);
+  label(x,'cut at '+cut,A.X(cut)+5,A.T+8,col('ink'),'left',1)};
+ function go(){const N=n(),P=p(),m=N*P,s=Math.sqrt(N*P*(1-P)),K=Math.min(k(),N);let ex=0;for(let j=0;j<=K;j++)ex+=binom(N,j,P);const ok=m>=5&&N*(1-P)>=5;
+  R([['μ = np, σ² = np(1 − p)',f(m,1)+', '+f(s*s,2)],['exact P(X ≤ '+K+')',f(ex,4),1],['normal with +0.5',f(Phi((K+.5-m)/s),4),cc],['normal without',f(Phi((K-m)/s),4),!cc],['np ≥ 5 and n(1 − p) ≥ 5?',ok?'yes: approximation OK':'no: use the exact binomial']]);F.render()}
+ go()},
 pdf(lab){
  const F=Fig(lab,340),c=el('div','ctrls');lab.appendChild(c);let samples=[];
  const fx=x=>x>2&&x<3?2*(3-x):0;
@@ -415,6 +489,15 @@ regression(lab){
 
 /* ---------- topic content ---------- */
 const TOPICS=[
+{id:'describe',nav:'Describing data',title:'Describing data: summaries and plots',lede:'Before any model, look at the data. One set of 40 measured bolts, five ways to see it.',
+cap:'Tensile strength of 40 steel bolts (in MPa above 800; made-up sample data). Switch the plot, add one extreme bolt, or let the machine drift during the day.',
+words:['<b>Mean</b> = the balance point of the data. <b>Median</b> = the middle bolt when you line them up. One extreme bolt pulls the mean, but the median hardly moves.','<b>Stem-and-leaf</b>: a histogram you can still read the numbers from. Stem = tens, leaf = units.','<b>Histogram</b>: count how many fall in each class. The bin width changes the picture: too narrow is noisy, too wide hides the shape.','<b>Box plot</b>: the box holds the middle 50% (Q1 to Q3), the line is the median, whiskers reach to 1.5 × IQR; anything further is an outlier.','<b>Time sequence plot</b>: the same numbers in the order they were measured. Only this plot shows a machine that slowly drifts.','<b>Probability plot</b>: dots on a straight line → a normal distribution fits (exercise 24a).'],
+rule:['x̄ = Σxᵢ / n','s² = Σ(xᵢ − x̄)² / (n − 1)','IQR = Q3 − Q1; outlier beyond 1.5 × IQR from the box','quartile position: (n + 1)·p in the sorted list'],exam:'Section 6.1–6.7; exercise 24a (probability plot), exercise 18 (empirical distribution).',
+quiz:[['You add one extremely strong bolt to the data. What happens?',['Mean and median both jump','The mean moves noticeably, the median barely','The median moves more than the mean'],1,'The mean uses every value, so one extreme pulls it. The median only cares about the middle position.'],
+['Which plot shows that the machine slowly drifts during the day?',['Histogram','Box plot','Time sequence plot'],2,'Histograms and box plots throw away the order. Only the time sequence plot keeps it.'],
+['In a box plot, the box contains …',['the middle 50% of the data','all data within one standard deviation','95% of the data'],0,'From Q1 (25%) to Q3 (75%).'],
+['Why does the sample variance divide by n − 1?',['To make it unbiased for σ²','Because the first value does not count','It is a rounding convention'],0,'Using x̄ instead of μ makes the squares a bit too small; dividing by n − 1 corrects that.'],
+['The points of a probability plot lie close to a straight line. Conclusion?',['The data are uniform','A normal model is reasonable','The mean equals the median exactly'],1,'Straight line = the sorted data match the expected normal z-scores.']]},
 {id:'pdf',nav:'Density & area',title:'Density: chance is area',lede:'A length or a time can take any value, so the chance of exactly 2.5000… is zero. We talk about the chance of an interval instead.',
 cap:'Cube edge X with density f(x) = 2(3 − x) on 2 < x < 3 (exercise 2). Move a and b: the orange area is P(a < X < b). Drop cubes to watch real samples pile up like sand.',
 words:['Think of the density curve as a pile of sand that weighs exactly 1 kilo. The chance that X lands between a and b is the amount of sand between a and b: the <b>area</b>.','The <b>height is not a chance</b>. Here it is 2 at x = 2. Only the total area has to be 1 (and the curve may never go below 0).','The expected value E[X] is the <b>balance point</b>: put the sand on a seesaw, where does it balance?','The CDF F(x) = P(X ≤ x) is “how much sand lies left of x”. Take its derivative and you get the density back.','For a new variable like the volume W = X³, go via the CDF: P(W ≤ w) = P(X ≤ w<sup>1/3</sup>).'],
@@ -423,6 +506,14 @@ quiz:[['For the cube edge, what is P(X > 2.5)?',['1/2','1/4','3/4','f(2.5) = 1']
 ['f(2) = 2 for the cube edge. Is that allowed for a density?',['No, a chance can never be above 1','Yes, only the total area must be 1','Only if the interval is shorter than 1'],1,'Height is not a chance. Only areas are chances.'],
 ['E[volume] = E[X³] = 13.1. Why is that not (7/3)³ ≈ 12.7?',['Rounding error','E[g(X)] is not g(E[X]) when g is not a straight line','Because the volume is not random'],1,'You must compute ∫ x³ f(x) dx. Plugging in the mean only works for linear functions.'],
 ['On which interval is f(x) = sin x a density?',['[0, π]','[0, π/2]','[0, 2π]'],1,'∫₀^π sin x dx = 2, too big. Half of that, [0, π/2], gives area 1 (and sin x ≥ 0 there).']]},
+{id:'normal',nav:'Normal & uniform',title:'Normal and uniform: the two shapes you use most',lede:'The bell curve for things that vary around a target, the flat rectangle for “anything between a and b is equally likely”.',
+cap:'Normal: 500 g butter packs (as in exercise 28). The red row turns grams into z-scores. Uniform: a bus that arrives somewhere in a time window.',
+words:['A normal curve is set by two numbers: <b>μ</b> (where the middle is) and <b>σ</b> (how wide).','<b>z-score</b> = how many σ you are from the middle: z = (x − μ)/σ. Every normal becomes the standard normal Z this way, so one table (Φ) works for all.','Rules of thumb: about 68% within ±1σ, 95% within ±1.96σ, 99.7% within ±3σ.','<b>Uniform(a, b)</b>: a flat rectangle. Height 1/(b − a), so the area is 1. Chance = length of the piece / total length.','Variance of any continuous X: Var(X) = E[X²] − (E[X])². For the cube edge that gives 5.5 − (7/3)² = 1/18.'],
+rule:['Z = (X − μ)/σ ~ N(0, 1)','P(a < X < b) = Φ((b − μ)/σ) − Φ((a − μ)/σ)','Φ(−z) = 1 − Φ(z)','Uniform: E = (a + b)/2, Var = (b − a)²/12','Var(X) = E[X²] − (E[X])²'],exam:'Section 4.3, 4.4, 4.5; exercises 2, 5, 15, 28.',
+quiz:[['Butter packs: μ = 500, σ = 10. P(pack < 480 g)?',['0.0228','0.1587','0.4772'],0,'z = (480 − 500)/10 = −2. Φ(−2) = 0.0228.'],
+['The middle 95% of a normal lies between …',['μ ± σ','μ ± 1.96σ','μ ± 3σ'],1,'Φ(1.96) = 0.975, so 2.5% is left in each tail.'],
+['Bus uniform between 0 and 10 min. Variance of your wait?',['10/12','100/12 ≈ 8.33','5'],1,'(b − a)²/12 = 100/12.'],
+['Cube edge (exercise 2): E[X²] = 5.5 and E[X] = 7/3. Var(X)?',['1/18 ≈ 0.056','5.5 − 7/3 ≈ 3.17','(7/3)² ≈ 5.44'],0,'5.5 − 49/9 = 0.5/9 = 1/18.']]},
 {id:'exponential',nav:'Exponential',title:'Exponential: the waiting time that forgets',lede:'Waiting for something that happens by accident — a lamp hit by a voltage spike, a customer walking in. Nothing wears out.',
 cap:'Supermarket queue (exercise 8): λ = 0.32 per minute. Slide “already waited”: the chance of waiting 3 more minutes does not change.',
 words:['<b>Memoryless</b>: if you already waited 2 minutes, the rest of your wait looks exactly like a fresh start. The dashed curve (your future) has the same shape as the original.','So a car or a human body is <b>not</b> exponential: they wear out, old ones break sooner. The uniform distribution is also not memoryless (exercise 5).','λ is the rate: events per minute. The average wait is 1/λ. Fast rate → short waits.','Double every waiting time (Y = 2X): still exponential, rate halves to λ/2.'],
@@ -446,6 +537,14 @@ rule:['X̄ ≈ N(μ, σ²/n)','X₁ + … + Xₙ ≈ N(nμ, nσ²)','z = (x̄ �
 quiz:[['b = 4: μ = 3/2, Var(Xᵢ) = 3/4, n = 10. P(average > 2)?',['P(Z > 0.58) ≈ 0.28','P(Z > 1.83) ≈ 0.034','P(Z > 5.8) ≈ 0'],1,'σ² of the average = 0.75/10 = 3/40. z = 0.5/√0.075 = 1.83.'],
 ['Can you use the CLT when b = 3?',['Yes, n = 10 is large enough','No, the variance is infinite','Only with continuity correction'],1,'For b = 3 E[X²] = ∞. No finite σ, no CLT.'],
 ['You take 4× as many dice. The width of the bell becomes …',['4× smaller','2× smaller','the same'],1,'σ/√n: √4 = 2.']]},
+{id:'normbinom',nav:'Normal ≈ binomial',title:'Normal approximation to the binomial',lede:'Counting defects in a big batch: the binomial bars start to look like a bell, so we can use the normal table.',
+cap:'Defects in a batch of n products with defect rate p. Blue bars are P(X ≤ k) exactly, the orange area is the normal approximation. Toggle the ±0.5.',
+words:['A binomial count with many tries looks normal, with μ = np and σ² = np(1 − p).','Only do this if <b>np ≥ 5 and n(1 − p) ≥ 5</b>. With 20 products and 10% defects (exercise 27) np = 2: too small, use the exact binomial.','<b>Continuity correction</b>: a bar for k runs from k − 0.5 to k + 0.5. So P(X ≤ 7) becomes P(Y ≤ 7.5). Watch the dashed line: with +0.5 the whole last bar is included.','“Less than 7” means X ≤ 6, so you use 6.5. Translate the words to ≤ first, then add 0.5.'],
+rule:['X ~ Bin(n, p) ≈ N(np, np(1 − p))','P(X ≤ k) ≈ Φ((k + 0.5 − np)/√(np(1 − p)))','P(X ≥ k) ≈ 1 − Φ((k − 0.5 − np)/√(np(1 − p)))','check: np ≥ 5 and n(1 − p) ≥ 5'],exam:'Section 4.6; compare exercise 11c (same trick for Poisson) and 27 (where it is not allowed).',
+quiz:[['n = 20, p = 0.1 (exercise 27). Use the normal approximation?',['Yes, n = 20 is big','No, np = 2 is below 5'],1,'That is why exercise 27 says: answer without the normal approximation.'],
+['With continuity correction, P(X ≤ 7) becomes …',['P(Y ≤ 6.5)','P(Y ≤ 7)','P(Y ≤ 7.5)'],2,'Include the whole bar of 7, which ends at 7.5.'],
+['P(X < 7) with continuity correction?',['P(Y ≤ 6.5)','P(Y ≤ 7.5)','P(Y ≤ 7)'],0,'“Less than 7” = “at most 6”, so the cut is at 6.5.'],
+['n = 100, p = 0.5. Mean and standard deviation of the approximating normal?',['50 and 25','50 and 5','100 and 10'],1,'np = 50, np(1 − p) = 25, σ = 5.']]},
 {id:'joint',nav:'Joint & correlation',title:'Two variables together: covariance and correlation',lede:'Overtime of employee A (X) and B (Y) in one table. Do they move together?',
 cap:'Exercise 12: the joint table in 1/16ths. Pick a condition to zoom in. Below: what a correlation looks like as a cloud of dots.',
 words:['A <b>joint table</b> gives the chance of each combination. Add up a row → marginal of X. Add up a column → marginal of Y.','<b>Conditional</b> = zoom in: keep only the cells where the condition is true, then divide by their total.','<b>Covariance</b>: when A works late, does B also work late? Positive = yes. <b>Correlation</b> ρ is the same idea scaled to −1…1, so it has no units.','Independent → covariance 0. But covariance 0 does not always mean independent.'],
@@ -524,10 +623,10 @@ TOPICS.forEach((t,ti)=>{const s=el('section','topic');s.id='t-'+t.id;
  build();btn(qz,'Reset questions',build,1);
  const nx=s.querySelector('.next');const prev=TOPICS[ti-1],next=TOPICS[ti+1];nx.innerHTML=(prev?`<a href="#${prev.id}">← ${prev.nav}</a>`:'<span></span>')+(next?`<a href="#${next.id}">${next.nav} →</a>`:'');
 });
-main.insertAdjacentHTML('beforeend','<p class="foot">Built from your T-exercises (questions 1–40) and the week 1 answers. Progress is saved in this browser only.</p>');
+main.insertAdjacentHTML('beforeend','<p class="foot">Built from your T-exercises (questions 1–40), the week 1 answers and the sections of weeks 1–2. Progress is saved in this browser only.</p>');
 function marks(){let n=0;TOPICS.forEach(t=>{const d=!!done[t.id];if(d)n++;document.getElementById('n-'+t.id).classList.toggle('done',d)});document.getElementById('mcount').textContent=n+' / '+TOPICS.length;document.getElementById('mbar').style.width=(n/TOPICS.length*100)+'%'}
 function burst(x,y){const cs=['#a31621','#1b5e20','#fff68f','#e6ccb2','#1c1c1c','#f7c600'];for(let i=0;i<16;i++){const b=el('span','bit');b.style.left=x+'px';b.style.top=y+'px';b.style.background=cs[i%cs.length];b.style.setProperty('--dx',(Math.random()*160-80)+'px');b.style.setProperty('--dy',(Math.random()*-140-20)+'px');document.body.appendChild(b);setTimeout(()=>b.remove(),950)}}
-function route(){const id=(location.hash||'#pdf').slice(1);const t=TOPICS.find(x=>x.id===id)||TOPICS[0];document.querySelectorAll('.topic').forEach(s=>s.classList.toggle('show',s.id==='t-'+t.id));nav.querySelectorAll('a').forEach(a=>a.classList.toggle('on',a.id==='n-'+t.id));
+function route(){const id=(location.hash||'#'+TOPICS[0].id).slice(1);const t=TOPICS.find(x=>x.id===id)||TOPICS[0];document.querySelectorAll('.topic').forEach(s=>s.classList.toggle('show',s.id==='t-'+t.id));nav.querySelectorAll('a').forEach(a=>a.classList.toggle('on',a.id==='n-'+t.id));
  document.getElementById('n-'+t.id).scrollIntoView({block:'nearest',inline:'center'});requestAnimationFrame(()=>figs.forEach(F=>F.render()))}
 window.addEventListener('hashchange',()=>{route();window.scrollTo(0,0)});
 const rerender=()=>figs.forEach(F=>F.render());new MutationObserver(rerender).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme']});
